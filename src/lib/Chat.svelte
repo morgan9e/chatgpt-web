@@ -423,6 +423,9 @@
     <p class="control settings">
       <button title="Chat/Profile Settings" class="button" on:click|preventDefault={showSettingsModal}><span class="icon"><Fa icon={faGear} /></span></button>
     </p>
+    <p class="control">
+      <button class="button is-ghost" on:click|preventDefault={suggestName}><span class="icon"><Fa icon={faLightbulb} /></span></button>
+    </p>
     <p class="control queue">
       <button title="Queue message, don't send yet" class:is-disabled={chatRequest.updating} class="button is-ghost" on:click|preventDefault={addNewMessage}><span class="icon"><Fa icon={faArrowUpFromBracket} /></span></button>
     </p>
