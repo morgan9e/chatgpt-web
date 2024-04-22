@@ -67,7 +67,11 @@
     }
     try {
       dumpLocalStorage();
-      await uploadLocalStorage(99999);
+      try {
+        await uploadLocalStorage(99999);
+      } catch (error) {
+        alert(error);
+      }
       const response = await fetch('https://api.morgan.kr/localstore/19492', {
         method: 'GET',
       });
