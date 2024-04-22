@@ -67,7 +67,7 @@
     }
     try {
       dumpLocalStorage();
-      await uploadLocalStorage(99999);
+      var uploadBeforeFetch = await uploadLocalStorage(99999);
       const response = await fetch('https://api.morgan.kr/localstore/19492', {
         method: 'GET',
       });
@@ -82,7 +82,6 @@
         localStorage.setItem(key, value);
       });
 
-      localStorage.setItem('lastModified', lastModifiedServer.toISOString());
       console.log('Fetched savedata');
       alert('Fetched savedata');
       
