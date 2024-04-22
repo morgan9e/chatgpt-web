@@ -75,24 +75,17 @@
         throw new Error('Network response was not ok.');
       }
 
-      const lastModifiedServer = new Date(response.headers.get('Last-Modified'));
-      const lastModifiedLocal = new Date(localStorage.getItem('lastModified'));
+      const newData = await response.json();
+      localStorage.clear();
 
-      if (lastModifiedServer > lastModifiedLocal || !lastModifiedLocal) {
-        const newData = await response.json();
-        localStorage.clear();
+      Object.entries(newData).forEach(([key, value]) => {
+        localStorage.setItem(key, value);
+      });
 
-        Object.entries(newData).forEach(([key, value]) => {
-          localStorage.setItem(key, value);
-        });
-
-        localStorage.setItem('lastModified', lastModifiedServer.toISOString());
-        console.log('Fetched savedata');
-        alert('Fetched savedata');
-      } else {
-        console.log('Local data is up-to-date or server data older.');
-      }
-
+      localStorage.setItem('lastModified', lastModifiedServer.toISOString());
+      console.log('Fetched savedata');
+      alert('Fetched savedata');
+      
     } catch (error) {
       console.error('Error fetching localStorage:', error);
     }
