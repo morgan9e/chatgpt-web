@@ -1,5 +1,6 @@
 <script lang="ts">
   import Code from './Code.svelte'
+  import Codespan from './Codespan.svelte'
   import { afterUpdate, createEventDispatcher, onMount } from 'svelte'
   import { deleteMessage, deleteSummaryMessage, truncateFromMessage, submitExitingPromptsNow, continueMessage, updateMessages } from './Storage.svelte'
   import { getPrice } from './Stats.svelte'
@@ -12,6 +13,9 @@
   import PromptConfirm from './PromptConfirm.svelte'
   import { getImage } from './ImageStore.svelte'
   import { getModelDetail } from './Models.svelte'
+
+  import katex from 'katex';
+  import '../katex.min.css';
 
   export let message:Message
   export let chatId:number
@@ -214,6 +218,37 @@
     document.body.removeChild(a)
   }
 
+  const preprocessMath = (text: string): string => {      
+    const codeBlockPlaceholderPrefix = "C0D3B10CKPR3F1X";
+    let index = 0;
+    const codeBlocks = [];
+
+    const codeBlockRegex = /(```[\s\S]*?```|`[^`]*`)/g;
+    
+    text = text.replace(codeBlockRegex, (match) => {
+      const placeholder = `${codeBlockPlaceholderPrefix}${index}`;
+      codeBlocks.push(match);
+      index++;
+      return placeholder;
+    });
+
+    text = text
+            .replace(/\\\(/g, '$ ').replace(/\\\)/g, ' $')
+            .replace(/\\\[/g, '$$ ').replace(/\\\]/g, ' $$')
+            .replace(/\$\$((?:\s|\S)*?)\$\$/g, (match, math) => {
+                return '\n```rendermath\n'+ math.trim() + '\n```\n'
+            })
+            .replace(/(?<!\\|\$)\$(?!\$)(.*?[^\\])\$(?!\$)/g, (match, math) => {
+                return '`rendermath'+ math.trim() + '`'
+            })
+            
+    text = text.replace(new RegExp(`${codeBlockPlaceholderPrefix}(\\d+)`, 'g'), (match, p1) => {
+              return codeBlocks[p1];
+            });
+
+    return text;
+  };
+
 </script>
 
 <article
@@ -253,9 +288,9 @@
         {/if}
         {#key refreshCounter}
         <SvelteMarkdown 
-          source={displayMessage} 
+          source={preprocessMath(displayMessage)} 
           options={markdownOptions} 
-          renderers={{ code: Code, html: Code }}
+          renderers={{ code: Code, html: Code, codespan: Codespan }}
         />
         {/key}
         {#if imageUrl}
