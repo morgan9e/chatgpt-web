@@ -88,6 +88,13 @@ const gpt4128kpreview = {
       max: 131072 // 128k max token buffer
 }
 
+const llama3 = {
+  ...chatModelBase,
+  prompt: 0.00003,
+  completion: 0.00006,
+  max: 8192
+}
+
 export const chatModels : Record<string, ModelDetail> = {
   'gpt-3.5-turbo': { ...gpt3516k },
   'gpt-3.5-turbo-0301': { ...gpt35 },
@@ -104,7 +111,9 @@ export const chatModels : Record<string, ModelDetail> = {
   'gpt-4-0125-preview': { ...gpt4128kpreview },
   'gpt-4-32k': { ...gpt432k },
   'gpt-4-32k-0314': { ...gpt432k },
-  'gpt-4-32k-0613': { ...gpt432k }
+  'llama3-70b-8192': { ...llama3 },
+  'llama3-8b-8192': { ...llama3 },
+  '@cf/meta/llama-3-8b-instruct': { ...llama3 }
 }
 
 const imageModelBase = {
