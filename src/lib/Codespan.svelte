@@ -1,6 +1,7 @@
 <script lang="ts">
   export let raw
   import katex from 'katex';
+  import 'katex/contrib/mhchem';  
 
   let renderedMath: string | undefined;
   if (raw.startsWith("`rendermath")) {

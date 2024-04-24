@@ -28,6 +28,7 @@
   } from 'svelte-highlight/languages/index'
 
   import katex from 'katex';
+  import 'katex/contrib/mhchem';  
 
   export const type: 'code' = 'code'
   export const raw: string = ''
