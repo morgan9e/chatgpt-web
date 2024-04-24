@@ -110,8 +110,8 @@ export const chatModels : Record<string, ModelDetail> = {
   'gpt-4-0125-preview': { ...gpt4128kpreview },
   'gpt-4-32k': { ...gpt432k },
   'gpt-4-32k-0314': { ...gpt432k },
-  'llama3-70b-8192': { ...llama3 }
-  'llama3-8b-8192': { ...llama3 }
+  'llama3-70b-8192': { ...llama3 },
+  'llama3-8b-8192': { ...llama3 },
   '@cf/meta/llama-3-8b-instruct': { ...llama3 }
 }
 
