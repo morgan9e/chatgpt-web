@@ -118,11 +118,31 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    
     } catch (error) {
       console.error('Error dumping localStorage:', error);
     }
+  }
+
+  function loadLocalStorage() {
+    var fileInput = document.createElement('input');
+    fileInput.type = "file";
+    fileInput.addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var data = JSON.parse(e.target.result);
+          Object.keys(data).forEach(function(key) {
+            localStorage.setItem(key, data[key]);
+          });
+          window.location.reload();
+        };
+        reader.readAsText(file);
+      }
+    });
+    document.body.appendChild(fileInput);
+    fileInput.click();
+    fileInput.remove();
   }
 
   onMount(() => {
@@ -178,12 +198,12 @@
           </div>
         </div>  
         <div class="is-left is-up ml-2">
-            <button class="button" aria-haspopup="true" on:click|preventDefault|stopPropagation={() => { uploadLocalStorage(); }}>
+            <button class="button" aria-haspopup="true" on:click|preventDefault|stopPropagation={() => { loadLocalStorage(); }}>
               <span class="icon"><Fa icon={faUpload}/></span>
             </button>
         </div>
         <div class="is-left is-up ml-2">
-            <button class="button" aria-haspopup="true" on:click|preventDefault|stopPropagation={() => { fetchLocalStorage(); }}>
+            <button class="button" aria-haspopup="true" on:click|preventDefault|stopPropagation={() => { dumpLocalStorage(); }}>
               <span class="icon"><Fa icon={faDownload}/></span>
             </button>
         </div>
