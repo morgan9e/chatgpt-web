@@ -27,6 +27,34 @@
 
   let showSortMenu = false
 
+
+  function dumpLocalStorage(){
+     try {
+      let storageObject = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key) {
+          storageObject[key] = localStorage.getItem(key);
+        }
+      }
+
+      const dataStr = JSON.stringify(storageObject, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const now = new Date();
+      const dateTimeStr = now.toISOString().replace(/:\d+\.\d+Z$/, '').replace(/-|:/g, '_');
+      link.download = `ChatGPT-web-${dateTimeStr}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    
+    } catch (error) {
+      console.error('Error dumping localStorage:', error);
+    }
+  }
 </script>
 
 <aside class="menu main-menu" class:pinned={$pinMainMenu} use:clickOutside={() => { $pinMainMenu = false }}>
