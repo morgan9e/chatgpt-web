@@ -30,6 +30,7 @@
 </script>
 
 <aside class="menu main-menu" class:pinned={$pinMainMenu} use:clickOutside={() => { $pinMainMenu = false }}>
+  <div style="font-size:8px;position:fixed;top:1px;right:2px;">V&&&BUILDVER&&&</div>
   <div class="menu-expanse">
       <div class="navbar-brand menu-nav-bar">
         <a class="navbar-item gpt-logo" href={'#/'}>
