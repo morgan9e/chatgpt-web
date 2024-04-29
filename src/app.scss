@@ -33,6 +33,12 @@ html {
 
   --BgColor: var(-BgColorLight);
   --running-totals: 0;
+
+}
+
+body, button, input, select, textarea {
+  font-family: "Noto Sans", "Source Sans 3", "Fira Sans", sans-serif !important;
+
 }
 
 .navbar {
@@ -47,7 +53,7 @@ html {
   }
 }
 
-@media only screen and (max-width: 900px) {
+@media only screen and (max-width: 1200px) {
   html {
     --sidebarWidth: max(250px, 20%);
  
@@ -61,19 +67,19 @@ html {
   
 }
 
-@media screen and (min-width: 1024px) {
+@media screen and (min-width: 1200px) {
   .modal-card.wide {
     width: 960px !important;
   }
 }
 
-@media only screen and (max-width: 900px) and (min-width: 769px) {
+@media only screen and (max-width: 1200px) {
   .chat-menu-item .chat-icon {
     display: none;
   }
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 900px) {
   .navbar {
     display: block !important;
   }
@@ -139,19 +145,21 @@ select option.is-default {
 
 .user-message {
   max-width: 90%;
-  margin-right: 0;
+  margin-right: auto;
   margin-left: auto;
-  width: fit-content;
+  width: 90%;
 }
 
 .assistant-message {
   max-width: 90%;
-  width: fit-content;
+  margin-right: auto;
+  margin-left: auto;
+  width: 90%;
 }
 
 /* Swap the border on user messages to the other side */
 .user-message>.message-body {
-  border-width: 0 4px 0 0 !important;
+  border-width: 0 0 0 4px !important;
 }
 
 /* Show the edit button on hover of the chat name */
@@ -160,6 +168,15 @@ select option.is-default {
   text-decoration: none !important;
 }
 
+.content {
+  font-family: "Noto Sans", "Source Sans 3", "Fira Sans", sans-serif !important;
+  font-size: 15px;
+  line-height: 30px;
+}
+
+.code {
+  font-family: "Monaco", "Hack", monospace !important;
+}
 /* Style the chat input */
 .chat-input {
   overflow-y: hidden;
@@ -194,6 +211,17 @@ select option.is-default {
   }
 }
 
+@media (prefers-color-scheme: dark) {
+  .user-message .message-body
+  {
+    color: #BCC !important;
+  }
+
+  .assistant-message .message-body
+  {
+    color: #CBC !important;
+  }
+}
 /* Support for dark mode */
 $modal-background-background-color-dark: rgba($dark, 0.86) !default; // remove this once a new version of bulma-prefers-dark is released
 @import "/node_modules/bulma-prefers-dark/build/bulma-prefers-dark.sass";
@@ -225,6 +253,7 @@ $modal-background-background-color-dark: rgba($dark, 0.86) !default; // remove t
 .menu {
   position: sticky;
   top: 1rem;
+  font-size: 14px;
 }
 
 /* Delete button on side menu chat name */
@@ -331,7 +360,7 @@ $modal-background-background-color-dark: rgba($dark, 0.86) !default; // remove t
   overflow: visible;
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 900px) {
   .main-menu .dropdown-menu .dropdown-content {
     max-height: calc(100vh - 112px);
   }
@@ -415,7 +444,7 @@ aside.menu.main-menu .menu-expanse {
 }
 
 .default-text {
-  color: hsl(0, 0%, 21%) !important;
+  color: hsl(0, 0%, 10%) !important;
 }
 
 .lower-mask, .lower-mask2 {
@@ -439,7 +468,7 @@ aside.menu.main-menu .menu-expanse {
 
 @media (prefers-color-scheme: dark) {
   .default-text {
-    color: rgb(181, 181, 181) !important;
+    color: rgb(255, 240, 255) !important;
   }
   .lower-mask, .lower-mask2 {
     background-image: linear-gradient(180deg,hsla(0,0%,100%,0) 13.94%, var(--BgColorDark) 54.73%);
@@ -507,7 +536,7 @@ aside.menu.main-menu .menu-expanse {
   }
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 900px) {
   .prompt-input-container {
     .control.send .button {
       width: auto;
@@ -551,7 +580,7 @@ aside.menu.main-menu .menu-expanse {
   padding-right: 2px;
 }
 
-@media only screen and (max-width: 900px) {
+@media only screen and (max-width: 1200px) {
   .main-menu .dropdown.is-right .dropdown-menu {
     right:auto;
     left:0;
@@ -626,7 +655,7 @@ aside.menu.main-menu .menu-expanse {
   border-radius: 0px 4px 4px 0px;
 }
 .user-message .tool-drawer-mask {
-  border-radius: 4px 0px 0px 4px;
+  border-radius: 0px 4px 4px 0px;
 }
 .message:last-of-type .tool-drawer, .tool-drawer-mask {
   top: auto;
@@ -636,7 +665,7 @@ aside.menu.main-menu .menu-expanse {
   left:100%;
 }
 .user-message .tool-drawer, .user-message .tool-drawer-mask {
-  right:100%;
+  left:100%;
 }
 .assistant-message:hover .tool-drawer,
 .assistant-message.editing .tool-drawer {
