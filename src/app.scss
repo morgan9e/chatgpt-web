@@ -157,11 +157,79 @@ select option.is-default {
   width: 90%;
 }
 
-/* Swap the border on user messages to the other side */
-.user-message>.message-body {
-  border-width: 0 0 0 4px !important;
+.message-body code, .message-body pre {
+  background-color: #EEE !important;
 }
 
+.chat-header {
+  width: 90%;
+  margin: auto;
+  padding-left: 40px;
+  margin-top: 20px;
+}
+
+.message {
+  border-radius: 0px !important;
+  padding: 10px 20px;
+  margin-bottom: 0px !important;
+}
+
+.user-message>.message-body {
+  border-radius: 0;
+  border-width: 0;
+  color: #000 !important;
+  margin-bottom: 0px !important;
+}
+
+.user-message {
+  border: solid #D9D9D9;
+  border-width: 1px 0;
+  background-color: #FFF !important;
+}
+
+.assistant-message>.message-body {
+  border-radius: 0;
+  border-width: 0;
+  color: #000 !important;
+}
+
+.assistant-message {
+  background-color: #F6F6F6 !important;
+}
+
+@media only screen and (max-width: 600px) {
+  .chat-content {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .chat-header {
+    padding-left: 20px;
+    margin-top: 0px;
+    padding-right: 20px;
+  }
+  .message {
+  padding-left: 5px;
+  padding-right: 5px;
+  }
+  .assistant-message {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 !important;
+  }
+  .user-message {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 !important;
+  }
+  .assistant-message .tool-drawer, .assistant-message .tool-drawer-mask {
+    left: calc(100% - 40px) !important;
+    background-color: transparent;
+  }
+  .user-message .tool-drawer, .user-message .tool-drawer-mask {
+    left: calc(100% - 40px) !important;
+    background-color: transparent;
+  }
+}
 /* Show the edit button on hover of the chat name */
 .chat-header:hover .editbutton {
   display: inline !important;
@@ -734,7 +802,6 @@ aside.menu.main-menu .menu-expanse {
 .message:last-of-type.incomplete .tool-drawer .msg-incomplete {
   display: block;
 }
-
 
 
 .modal {
