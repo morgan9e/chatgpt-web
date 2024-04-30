@@ -250,19 +250,6 @@
         return '`rendermath' + math.trim() + '`'
       })
 
-    // .replace(/\\\[((?:\s|\S)*?)\\\]/g, (match, math) => {
-    //     return '\n```rendermath\n' + math.trim() + '\n```\n'
-    // })
-    // .replace(/\$\$((?:\s|\S)*?)\$\$/g, (match, math) => {
-    //     return '\n```rendermath\n' + math.trim() + '\n```\n'
-    // })
-    // .replace(/\\\((?!\$)(.*?[^\\])\\\)/g, (match, math) => {
-    //     return '`rendermath' + math.trim() + '`'
-    // })
-    // .replace(/(?<!\\|\$)\$(?!\$)(.*?[^\\])\$(?!\$)/g, (match, math) => {
-    //     return '`rendermath' + math.trim() + '`'
-    // })
-
     text = text.replace(new RegExp(`${codeBlockPlaceholderPrefix}idx(\\d+)__`, 'g'), (match, p1) => {
       return codeBlocks[p1]
     })
@@ -313,8 +300,8 @@
         {/if}
         {#key refreshCounter}
         <SvelteMarkdown 
-          bind:source={displayMessage} 
-          options={markdownOptions} 
+          source={preprocessMath(displayMessage)}
+          options={markdownOptions}
           renderers={renderers}
         />
         {/key}
