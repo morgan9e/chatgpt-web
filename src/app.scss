@@ -279,17 +279,39 @@ select option.is-default {
   }
 }
 
+.code-block {
+  margin-bottom: .8em !important;
+  margin-top: .8em !important;
+}
+
 @media (prefers-color-scheme: dark) {
-  .user-message .message-body
-  {
-    color: #BCC !important;
+  :not(pre) > code {
+    color: #ff709a !important;
+  }
+  
+  .message-body code, .message-body pre {
+    background-color: #181818 !important;
   }
 
-  .assistant-message .message-body
-  {
-    color: #CBC !important;
+  .user-message {
+    border: solid #323232 1px;
+    background-color: #282828  !important;
+  }
+
+  .assistant-message {
+    border: solid #323232 1px;
+    background-color: #222222!important;
+  }
+
+  .user-message>.message-body { 
+    color: #FFF !important;
+  }
+
+  .assistant-message>.message-body {
+    color: #FFF !important;
   }
 }
+
 /* Support for dark mode */
 $modal-background-background-color-dark: rgba($dark, 0.86) !default; // remove this once a new version of bulma-prefers-dark is released
 @import "/node_modules/bulma-prefers-dark/build/bulma-prefers-dark.sass";
