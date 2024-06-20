@@ -14,8 +14,6 @@
   import { getImage } from './ImageStore.svelte'
   import { getModelDetail } from './Models.svelte'
 
-  import 'katex/dist/katex.min.css'
-
   export let message:Message
   export let chatId:number
   export let chat:Chat
@@ -223,42 +221,55 @@
     document.body.removeChild(a)
   }
 
-  const preprocessMath = (text: string): string => {
-    let codeBlockPlaceholderPrefix = '__prefix__c0d3b10ck__'
-    while (text.indexOf(codeBlockPlaceholderPrefix) > 0) {
-      codeBlockPlaceholderPrefix = codeBlockPlaceholderPrefix + '_'
+  const replaceLatexDelimiters = (text: string): string => {
+    let result = '';
+    let i = 0;
+
+    while (i < text.length) {
+      if (text.startsWith('\\(', i)) {
+        let endPos = text.indexOf('\\)', i + 2);
+        if (endPos === -1) {
+          console.error(`LaTeX: Delimiter mismatch at ${i}`)
+          result += text[i];
+          i++;
+        } else {
+          result += '`\\(' + text.slice(i + 2, endPos) + '\\)`';
+          i = endPos + 2;
+        }
+      } else if (text.startsWith('\\[', i)) {
+        let endPos = text.indexOf('\\]', i + 2);
+        if (endPos === -1) {
+          console.error(`LaTeX: Delimiter mismatch at ${i}`)
+          result += text[i];
+          i++;
+        } else {
+          result += `\`\\[${text.slice(i + 2, endPos)}\\]\``;
+          i = endPos + 2;
+        }
+      } else {
+        if (text.startsWith('\\(', i)) {
+          result += '\\(';
+          i += 2;
+        } else if (text.startsWith('\\)', i)) {
+          result += '\\)';
+          i += 2;
+        } else if (text.startsWith('\\[', i)) {
+          result += '\\[';
+          i += 2;
+        } else if (text.startsWith('\\]', i)) {
+          result += '\\]';
+          i += 2;
+        } else {
+          result += text[i];
+          i++;
+        }
+      }
     }
-    let index = 0
-    const codeBlocks = []
-
-    const codeBlockRegex = /(```[\s\S]*?```|`[^`]*`)/g
-  
-    text = text.replace(codeBlockRegex, (match) => {
-      const placeholder = `${codeBlockPlaceholderPrefix}idx${index}__`
-      codeBlocks.push(match)
-      index++
-      return placeholder
-    })
-
-    text = text
-      .replace(/(\\\[((?:\s|\S)*?)\\\])|(\$\$((?:\s|\S)*?)\$\$)/g, (match, p1, p2, p3, p4) => {
-        const math = p2 || p4
-        return '\n```rendermath\n' + math.trim() + '\n```\n'
-      })
-      .replace(/(\\\((?!\$)(.*?)\\\))|(?<!\\|\$)\$(?!\$)(.*?[^\\])\$(?!\$)/g, (match, p1, p2, p3) => {
-        const math = p2 || p3
-        return '`rendermath' + math.trim() + '`'
-      })
-
-    text = text.replace(new RegExp(`${codeBlockPlaceholderPrefix}idx(\\d+)__`, 'g'), (match, p1) => {
-      return codeBlocks[p1]
-    })
-
-    return text
+    return result
   }
 
   const renderMathMsg = () => {
-    displayMessage = preprocessMath(message.content);
+    displayMessage = replaceLatexDelimiters(message.content);
   };
 
 </script>
@@ -300,7 +311,7 @@
         {/if}
         {#key refreshCounter}
         <SvelteMarkdown 
-          source={preprocessMath(displayMessage)}
+          source={replaceLatexDelimiters(displayMessage)}
           options={markdownOptions}
           renderers={renderers}
         />

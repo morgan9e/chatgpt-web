@@ -1,14 +1,22 @@
 <script lang="ts">
   export let raw
-  import katex from 'katex'
   import 'katex/contrib/mhchem'
+  import renderMathInElement from 'katex/contrib/auto-render'
 
   let renderedMath: string | undefined
-  if (raw.startsWith('`rendermath')) {
-    renderedMath = katex.renderToString(raw.replace(/`rendermath|`/g, ''), {
-      throwOnError: false,
-      displayMode: false
-    })
+  if ( raw.startsWith('`\\(') || raw.startsWith('`\\[') ) {
+    let dummy = document.createElement("div")
+    dummy.textContent = raw.replace(/`/g, '')
+    renderMathInElement(dummy, {
+        delimiters: [
+            {left: '\\(', right: '\\)', display: false},
+            {left: '\\[', right: '\\]', display: true}
+        ],
+        throwOnError : false,
+        // output: "mathml"
+      })
+    renderedMath = dummy.innerHTML;
+    dummy.remove();
   }
 
 </script>
