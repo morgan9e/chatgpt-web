@@ -56,6 +56,16 @@ const setPetalsEnabled = (event: Event) => {
     <p>
       As an alternative to OpenAI, you can also use Petals swarm as a free API option for open chat models like Llama 2. 
     </p>
+    <br>
+    <style>
+      .katex-version {display: none;}
+      .katex-version::after {content:"0.10.2 or earlier";}
+    </style>
+    <span class="katex">
+      <span class="katex-mathml">The KaTeX stylesheet is not loaded!</span>
+      <span class="katex-version rule">KaTeX version:&nbsp;</span>
+    </span>
+
     </div>
   </article>
   <article class="message" class:is-danger={!hasModels} class:is-warning={!apiKey} class:is-info={apiKey}>
