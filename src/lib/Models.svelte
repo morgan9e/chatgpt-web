@@ -6,7 +6,7 @@
   import { getChatSettingObjectByKey } from './Settings.svelte'
   import { valueOf } from './Util.svelte'
   import { chatModels as openAiModels, imageModels as openAiImageModels } from './providers/openai/models.svelte'
-  import { chatModels as petalsModels } from './providers/petals/models.svelte'
+  // import { chatModels as petalsModels } from './providers/petals/models.svelte'
 
 const unknownDetail = {
     ...Object.values(openAiModels)[0]
@@ -14,7 +14,7 @@ const unknownDetail = {
 
 export const supportedChatModels : Record<string, ModelDetail> = {
     ...openAiModels,
-    ...petalsModels
+    // ...petalsModels
 }
 
 export const supportedImageModels : Record<string, ModelDetail> = {

@@ -3,8 +3,17 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'
 import dsv from '@rollup/plugin-dsv'
 
 import purgecss from '@fullhuman/postcss-purgecss'
+// import { visualizer } from 'rollup-plugin-visualizer';
 
-const plugins = [svelte(), dsv()]
+const plugins = [
+    svelte(),
+    dsv(),
+    // visualizer({
+    //   open: true,
+    //   gzipSize: true,
+    //   brotliSize: true,
+    // }),
+]
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode, ssrBuild }) => {
