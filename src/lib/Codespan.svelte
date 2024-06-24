@@ -13,7 +13,7 @@
             {left: '\\[', right: '\\]', display: true}
         ],
         throwOnError : false,
-        // output: "mathml"
+        output: "mathml"
       })
     renderedMath = dummy.innerHTML;
     dummy.remove();

@@ -250,6 +250,8 @@ select option.is-default {
   resize: vertical;
 }
 
+@import "/node_modules/katex/dist/katex.min.css";
+
 // $footer-padding: 1.5rem 1.5rem;
 // $fullhd: 2000px;
 // $modal-content-width: 1000px;
@@ -859,5 +861,3 @@ aside.menu.main-menu .menu-expanse {
 .modal.chat-settings .field-body {
   max-width: calc(100% - 40px);
 }
-
-@import "/node_modules/katex/dist/katex.min.css";
