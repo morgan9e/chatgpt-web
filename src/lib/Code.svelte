@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { Highlight } from 'svelte-highlight'
-  import flourite from 'flourite'
+  import { HighlightAuto , LineNumbers } from 'svelte-highlight'
 
   // Import both dark and light styles
   import { github, githubDark } from 'svelte-highlight/styles/index'
@@ -11,99 +10,15 @@
   // Copy function for the code block
   import copy from 'copy-to-clipboard'
 
-  // Import all supported languages
-  import {
-    javascript,
-    python,
-    typescript,
-    ruby,
-    go,
-    java,
-    sql,
-    shell,
-    php,
-    plaintext,
-    yaml,
-    type LanguageType
-  } from 'svelte-highlight/languages/index'
-
   import 'katex/contrib/mhchem'
   import renderMathInElement from 'katex/contrib/auto-render'
 
   export const type: 'code' = 'code'
   export const raw: string = ''
   export const codeBlockStyle: 'indented' | undefined = undefined
-  export let lang: string | undefined
   export let text: string
 
   let renderedMath: string | undefined;
-  // if ( text.startsWith('\\[') ) {
-  //   let dummy = document.createElement("div")
-  //   dummy.textContent = text;
-  //   renderMathInElement(dummy, {
-  //       delimiters: [
-  //           {left: '\\(', right: '\\)', display: false},
-  //           {left: '\\[', right: '\\]', display: true}
-  //       ],
-  //       throwOnError : true,
-  //     })
-  //   renderedMath = dummy.innerHTML;
-  //   dummy.remove();
-  // }
-
-  // Map lang string to LanguageType
-  let language: LanguageType<string>
-
-  // If no language is set, try to detect it using flourite
-  if (!lang) {
-    lang = flourite(text, { shiki: true }).language
-  }
-
-  switch (lang) {
-    case 'js':
-    case 'javascript':
-      language = javascript
-      break
-    case 'py':
-    case 'python':
-      language = python
-      break
-    case 'ts':
-    case 'typescript':
-      language = typescript
-      break
-    case 'rb':
-    case 'ruby':
-      language = ruby
-      break
-    case 'go':
-    case 'golang':
-      language = go
-      break
-    case 'java':
-      language = java
-      break
-    case 'sql':
-      language = sql
-      break
-    case 'sh':
-    case 'shell':
-    case 'bash':
-    case 'console':
-    case 'shellscript':
-    case 'zsh':
-      language = shell
-      break
-    case 'php':
-      language = php
-      break
-    case 'yaml':
-    case 'yml':
-      language = yaml
-      break
-    default:
-      language = plaintext
-  }
 
   // For copying code - reference: https://vyacheslavbasharov.com/blog/adding-click-to-copy-code-markdown-blog
   const copyFunction = (event) => {
@@ -140,6 +55,6 @@
 {:else}
   <div class="code-block is-relative">
     <button class="button is-light is-outlined is-small p-2" on:click={copyFunction}>Copy</button>
-    <Highlight code={text} {language} />
+    <HighlightAuto code={text} {language} />
   </div>
 {/if}
