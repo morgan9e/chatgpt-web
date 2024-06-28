@@ -56,6 +56,5 @@
   <div class="code-block is-relative">
     <button class="button is-light is-outlined is-small p-2" on:click={copyFunction}>Copy</button>
     <HighlightAuto code={text} />
-    </HighlightAuto>
   </div>
 {/if}
