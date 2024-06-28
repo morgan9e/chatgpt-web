@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { HighlightAuto , LineNumbers } from 'svelte-highlight'
+  import { HighlightAuto } from 'svelte-highlight'
 
   // Import both dark and light styles
   import { github, githubDark } from 'svelte-highlight/styles/index'
@@ -55,8 +55,7 @@
 {:else}
   <div class="code-block is-relative">
     <button class="button is-light is-outlined is-small p-2" on:click={copyFunction}>Copy</button>
-    <HighlightAuto code={text} let:highlighted>
-      <LineNumbers {highlighted} />
+    <HighlightAuto code={text} />
     </HighlightAuto>
   </div>
 {/if}
