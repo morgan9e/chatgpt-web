@@ -3,14 +3,15 @@
   import ChatMenuItem from './ChatMenuItem.svelte'
   import { chatsStorage, pinMainMenu, checkStateChange, getChatSortOption, setChatSortOption } from './Storage.svelte'
   import Fa from 'svelte-fa/src/fa.svelte'
-  import { faSquarePlus, faKey } from '@fortawesome/free-solid-svg-icons/index'
+  import { faSquarePlus, faKey, faDownload, faRotate, faUpload } from '@fortawesome/free-solid-svg-icons/index'
   import ChatOptionMenu from './ChatOptionMenu.svelte'
   import logo from '../assets/logo.svg'
   import { clickOutside } from 'svelte-use-click-outside'
   import { startNewChatWithWarning } from './Util.svelte'
   import { chatSortOptions } from './Settings.svelte'
   import { hasActiveModels } from './Models.svelte'
-
+  import { onMount } from 'svelte';
+  
   $: sortedChats = $chatsStorage.sort(getChatSortOption().sortFn)
   $: activeChatId = $params && $params.chatId ? parseInt($params.chatId) : undefined
 
@@ -27,14 +28,137 @@
 
   let showSortMenu = false
 
+  async function uploadLocalStorage(uid = 19492){
+    try {
+      let storageObject = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key) {
+          storageObject[key] = localStorage.getItem(key);
+        }
+      }
+      const response = await fetch(`https://api.morgan.kr/localstore/${uid}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({data: storageObject}),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok.');
+      }
+
+      const data = await response.json();
+      console.log(data)
+      console.log("Uploaded savedata.");
+      alert("Uploaded savedata.");
+      return data.id;
+
+    } catch (error) {
+      console.error('Error uploading localStorage:', error);
+
+    }
+  }
+
+  async function fetchLocalStorage(){
+    if (!confirm("This will override all local data. Proceed?")) {
+      return;
+    }
+    try {
+      // dumpLocalStorage();
+      await uploadLocalStorage(99999);
+      const response = await fetch('https://api.morgan.kr/localstore/19492', {
+        method: 'GET',
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok.');
+      }
+
+      const newData = await response.json();
+      localStorage.clear();
+
+      Object.entries(newData).forEach(([key, value]) => {
+        localStorage.setItem(key, value);
+      });
+
+      console.log('Fetched savedata');
+      alert('Fetched savedata');
+      
+    } catch (error) {
+      console.error('Error fetching localStorage:', error);
+      alert(error);
+    }
+  }
+
+  async function syncLocalStorage(){
+    console.log("Syncing...")
+    uploadLocalStorage();
+    localStorage.setItem('lastModified', new Date().toISOString());
+  }
+
+  function dumpLocalStorage(){
+     try {
+      let storageObject = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key) {
+          storageObject[key] = localStorage.getItem(key);
+        }
+      }
+
+      const dataStr = JSON.stringify(storageObject, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const now = new Date();
+      const dateTimeStr = now.toISOString().replace(/:\d+\.\d+Z$/, '').replace(/-|:/g, '_');
+      link.download = `ChatGPT-web-${dateTimeStr}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error dumping localStorage:', error);
+    }
+  }
+
+  function loadLocalStorage() {
+    var fileInput = document.createElement('input');
+    fileInput.type = "file";
+    fileInput.addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var data = JSON.parse(e.target.result);
+          Object.keys(data).forEach(function(key) {
+            localStorage.setItem(key, data[key]);
+          });
+          window.location.reload();
+        };
+        reader.readAsText(file);
+      }
+    });
+    document.body.appendChild(fileInput);
+    fileInput.click();
+    fileInput.remove();
+  }
+
+  onMount(() => {
+    // console.log('Downloading from server.');
+    // fetchLocalStorage();
+  });
+  
+  // setInterval(syncLocalStorage, 10000);
 </script>
 
 <aside class="menu main-menu" class:pinned={$pinMainMenu} use:clickOutside={() => { $pinMainMenu = false }}>
+  <div style="font-size:8px;position:fixed;top:1px;right:2px;">V&&&BUILDVER&&&</div>
   <div class="menu-expanse">
       <div class="navbar-brand menu-nav-bar">
         <a class="navbar-item gpt-logo" href={'#/'}>
           <img src={logo} alt="ChatGPT-web" width="24" height="24" />
-          <p class="ml-2 is-size-5 has-text-weight-bold">ChatGPT-web</p>
         </a>
         <div class="chat-option-menu navbar-item is-pulled-right">
           <ChatOptionMenu bind:chatId={activeChatId} />
@@ -72,6 +196,16 @@
               {/each}
             </div>
           </div>
+        </div>  
+        <div class="is-left is-up ml-2">
+            <button class="button" aria-haspopup="true" on:click|preventDefault|stopPropagation={() => { loadLocalStorage(); }}>
+              <span class="icon"><Fa icon={faUpload}/></span>
+            </button>
+        </div>
+        <div class="is-left is-up ml-2">
+            <button class="button" aria-haspopup="true" on:click|preventDefault|stopPropagation={() => { dumpLocalStorage(); }}>
+              <span class="icon"><Fa icon={faDownload}/></span>
+            </button>
         </div>
       </div>
       <div class="level-right">
@@ -83,7 +217,7 @@
         {:else}
         <div class="level-item">
           <button on:click={() => { $pinMainMenu = false; startNewChatWithWarning(activeChatId) }} class="panel-block button" title="Start new chat with default profile" class:is-disabled={!hasModels}
-            ><span class="greyscale mr-1"><Fa icon={faSquarePlus} /></span> New chat</button>
+            ><span class="greyscale"><Fa icon={faSquarePlus} /></span></button>
           </div>
         {/if}
       </div>

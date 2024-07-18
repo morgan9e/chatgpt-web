@@ -1,12 +1,13 @@
 <script lang="ts">
   import Code from './Code.svelte'
+  import Codespan from './Codespan.svelte'
   import { afterUpdate, createEventDispatcher, onMount } from 'svelte'
   import { deleteMessage, deleteSummaryMessage, truncateFromMessage, submitExitingPromptsNow, continueMessage, updateMessages } from './Storage.svelte'
   import { getPrice } from './Stats.svelte'
   import SvelteMarkdown from 'svelte-markdown'
   import type { Message, Model, Chat } from './Types.svelte'
   import Fa from 'svelte-fa/src/fa.svelte'
-  import { faTrash, faDiagramPredecessor, faDiagramNext, faCircleCheck, faPaperPlane, faEye, faEyeSlash, faEllipsis, faDownload, faClipboard } from '@fortawesome/free-solid-svg-icons/index'
+  import { faTrash, faDiagramPredecessor, faDiagramNext, faCircleCheck, faPaperPlane, faEye, faEyeSlash, faEllipsis, faDownload, faClipboard, faSquareRootVariable } from '@fortawesome/free-solid-svg-icons/index'
   import { errorNotice, scrollToMessage } from './Util.svelte'
   import { openModal } from 'svelte-modals'
   import PromptConfirm from './PromptConfirm.svelte'
@@ -30,6 +31,12 @@
     gfm: true, // Use GitHub Flavored Markdown
     breaks: true, // Enable line breaks in markdown
     mangle: false // Do not mangle email addresses
+  }
+  
+  const renderers = {
+    code: Code,
+    html: Code,
+    codespan: Codespan
   }
 
   const getDisplayMessage = ():string => {
@@ -214,6 +221,57 @@
     document.body.removeChild(a)
   }
 
+  const replaceLatexDelimiters = (text: string): string => {
+    let result = '';
+    let i = 0;
+
+    while (i < text.length) {
+      if (text.startsWith('\\(', i)) {
+        let endPos = text.indexOf('\\)', i + 2);
+        if (endPos === -1) {
+          console.error(`LaTeX: Delimiter mismatch at ${i}`)
+          result += text[i];
+          i++;
+        } else {
+          result += '`\\(' + text.slice(i + 2, endPos) + '\\)`';
+          i = endPos + 2;
+        }
+      } else if (text.startsWith('\\[', i)) {
+        let endPos = text.indexOf('\\]', i + 2);
+        if (endPos === -1) {
+          console.error(`LaTeX: Delimiter mismatch at ${i}`)
+          result += text[i];
+          i++;
+        } else {
+          result += `\`\\[${text.slice(i + 2, endPos)}\\]\``;
+          i = endPos + 2;
+        }
+      } else {
+        if (text.startsWith('\\(', i)) {
+          result += '\\(';
+          i += 2;
+        } else if (text.startsWith('\\)', i)) {
+          result += '\\)';
+          i += 2;
+        } else if (text.startsWith('\\[', i)) {
+          result += '\\[';
+          i += 2;
+        } else if (text.startsWith('\\]', i)) {
+          result += '\\]';
+          i += 2;
+        } else {
+          result += text[i];
+          i++;
+        }
+      }
+    }
+    return result
+  }
+
+  const renderMathMsg = () => {
+    displayMessage = replaceLatexDelimiters(message.content);
+  };
+
 </script>
 
 <article
@@ -253,9 +311,9 @@
         {/if}
         {#key refreshCounter}
         <SvelteMarkdown 
-          source={displayMessage} 
-          options={markdownOptions} 
-          renderers={{ code: Code, html: Code }}
+          source={replaceLatexDelimiters(displayMessage)}
+          options={markdownOptions}
+          renderers={renderers}
         />
         {/key}
         {#if imageUrl}
@@ -371,6 +429,16 @@
         <span class="icon"><Fa icon={faClipboard} /></span>
         </a>
       {/if}
+      <a
+        href={'#'}
+        title="Render LaTeX in message"
+        class="button is-small"
+        on:click|preventDefault={() => {
+          renderMathMsg()
+        }}
+      >
+      <span class="icon"><Fa icon={faSquareRootVariable} /></span>
+      </a>
       {#if imageUrl}
         <a
           href={'#'}

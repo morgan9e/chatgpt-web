@@ -3,7 +3,7 @@
   import Footer from './Footer.svelte'
   import { replace } from 'svelte-spa-router'
   import { afterUpdate, onMount } from 'svelte'
-  import { getPetalsBase, getPetalsWebsocket } from './ApiUtil.svelte'
+  import { getPetalsBase, getPetalsWebsocket, getApiBase, setApiBase } from './ApiUtil.svelte'
   import { set as setOpenAI } from './providers/openai/util.svelte'
   import { hasActiveModels } from './Models.svelte'
 
@@ -56,6 +56,16 @@ const setPetalsEnabled = (event: Event) => {
     <p>
       As an alternative to OpenAI, you can also use Petals swarm as a free API option for open chat models like Llama 2. 
     </p>
+    <br>
+    <style>
+      .katex-version {display: none;}
+      .katex-version::after {content:"0.10.2 or earlier";}
+    </style>
+    <span class="katex">
+      <span class="katex-mathml">The KaTeX stylesheet is not loaded!</span>
+      <span class="katex-version rule">KaTeX version:&nbsp;</span>
+    </span>
+
     </div>
   </article>
   <article class="message" class:is-danger={!hasModels} class:is-warning={!apiKey} class:is-info={apiKey}>
@@ -100,6 +110,35 @@ const setPetalsEnabled = (event: Event) => {
     </div>
   </article>
 
+  <article class="message is-danger">
+    <div class="message-body">
+        <p>Set OpenAI API Endpoint:</p>
+        <form
+          class="field has-addons has-addons-right"
+          on:submit|preventDefault={(event) => {
+            if (event.target && event.target[0].value) {
+              setApiBase(event.target[0].value);
+            } else {
+              setApiBase("https://api.openai.com");
+              event.target[0].value = "https://api.openai.com";
+            }
+          }}
+        >
+          <p class="control is-expanded">
+            <input
+              aria-label="OpenAI API  Endpoint"
+              type="text"
+              class="input"
+              placeholder="https://api.openai.com"
+              value={getApiBase() || 'https://api.openai.com'}
+            />
+          </p>
+          <p class="control">
+            <button class="button is-info" type="submit">Save</button>
+          </p>
+        </form>
+    </div>
+  </article>
   
   <article class="message" class:is-danger={!hasModels} class:is-warning={!showPetalsSettings} class:is-info={showPetalsSettings}>
     <div class="message-body">
