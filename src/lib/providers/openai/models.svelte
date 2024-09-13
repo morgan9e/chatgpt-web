@@ -99,6 +99,18 @@ const gpt4128kpreview = {
       completion: 0.00003, // $0.03 per 1000 tokens completion
       max: 131072 // 128k max token buffer
 }
+const o1preview = {
+      ...chatModelBase,
+      prompt: 0.00001, // $0.01 per 1000 tokens prompt
+      completion: 0.00003, // $0.03 per 1000 tokens completion
+      max: 131072 // 128k max token buffer
+}
+const o1mini = {
+      ...chatModelBase,
+      prompt: 0.00001, // $0.01 per 1000 tokens prompt
+      completion: 0.00003, // $0.03 per 1000 tokens completion
+      max: 131072 // 128k max token buffer
+}
 
 const llama3 = {
   ...chatModelBase,
@@ -116,6 +128,9 @@ export const chatModels : Record<string, ModelDetail> = {
   'gpt-3.5-turbo-16k-0613': { ...gpt3516k },
   'gpt-4': { ...gpt4 },
   'gpt-4o': { ...gpt4o },
+  'gpt-4o-2024-05-13': { ...gpt4o },
+  'gpt-4o-2024-08-06': { ...gpt4o },
+  'chatgpt-4o-latest': { ...gpt4o },
   'gpt-4o-mini': { ...gpt4omini },
   'gpt-4o-mini-2024-07-18': { ...gpt4omini },
   'gpt-4-turbo-preview': { ...gpt4128kpreview },
@@ -126,10 +141,11 @@ export const chatModels : Record<string, ModelDetail> = {
   'gpt-4-0125-preview': { ...gpt4128kpreview },
   'gpt-4-32k': { ...gpt432k },
   'gpt-4-32k-0314': { ...gpt432k },
+  'o1-preview': { ...o1preview },
+  'o1-mini': { ...o1mini },
   'mixtral-8x7b-32768': { ...llama3 }, 
   'llama3-70b-8192': { ...llama3 },
-  'llama3-8b-8192': { ...llama3 },
-  '@cf/meta/llama-3-8b-instruct': { ...llama3 }
+  'llama3-8b-8192': { ...llama3 }
 }
 
 const imageModelBase = {
