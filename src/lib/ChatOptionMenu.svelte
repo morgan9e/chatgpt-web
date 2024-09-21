@@ -157,6 +157,75 @@
     reader.readAsText(image)
   }
 
+  function dumpLocalStorage(){
+     try {
+      let storageObject = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key) {
+          storageObject[key] = localStorage.getItem(key);
+        }
+      }
+
+      const dataStr = JSON.stringify(storageObject, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const now = new Date();
+      const dateTimeStr = now.toISOString().replace(/:\d+\.\d+Z$/, '').replace(/-|:/g, '_');
+      link.download = `ChatGPT-web-${dateTimeStr}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    
+    } catch (error) {
+      console.error('Error dumping localStorage:', error);
+    }
+  }
+  
+  function loadLocalStorage() {
+    var fileInput = document.createElement('input');
+    fileInput.type = "file";
+    fileInput.addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var data = JSON.parse(e.target.result);
+          Object.keys(data).forEach(function(key) {
+            localStorage.setItem(key, data[key]);
+          });
+          window.location.reload();
+        };
+        reader.readAsText(file);
+      }
+    });
+    document.body.appendChild(fileInput);
+    fileInput.click();
+    fileInput.remove();
+  }
+
+  function backupLocalStorage() {
+     try {
+      let storageObject = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key) {
+          storageObject[key] = localStorage.getItem(key);
+        }
+      }
+      const dataStr = JSON.stringify(storageObject, null, 2);
+      const now = new Date();
+      const dateTimeStr = now.toISOString().replace(/:\d+\.\d+Z$/, '').replace(/-|:/g, '_');
+      localStorage.setItem(`prev-${dateTimeStr}`, dataStr);
+    } catch (error) {
+      console.error('Error backing up localStorage:', error);
+    }
+
+  }
+
 </script>
 
 <div class="dropdown {style}" class:is-active={showChatMenu} use:clickOutside={() => { showChatMenu = false }}>
@@ -206,6 +275,13 @@
       <hr class="dropdown-divider">
       <a href={'#'} class="dropdown-item" class:is-disabled={!hasActiveModels()} on:click|preventDefault={() => { if (chatId) close(); profileFileInput.click() }}>
         <span class="menu-icon"><Fa icon={faUpload}/></span> Restore Profile JSON
+      </a>
+      <hr class="dropdown-divider">
+      <a href={'#'} class="dropdown-item" on:click|preventDefault={() => { close(); dumpLocalStorage() }}>
+        <span class="menu-icon"><Fa icon={faUpload}/></span> Dump All Data
+      </a>
+      <a href={'#'} class="dropdown-item" on:click|preventDefault={() => { if (chatId) close(); backupLocalStorage(); loadLocalStorage() }}>
+        <span class="menu-icon"><Fa icon={faDownload}/></span> Load All Data
       </a>
       <hr class="dropdown-divider">
       <a href={'#'} class="dropdown-item" class:is-disabled={!chatId} on:click|preventDefault={() => { if (chatId) close(); delChat() }}>
