@@ -185,7 +185,7 @@ export class ChatRequest {
           messages: messagePayload,
           // Provide the settings by mapping the settingsMap to key/value pairs
           ...getRequestSettingList().reduce((acc, setting) => {
-            const key = setting.key
+            let key = setting.key
             let value = getChatSettingValueNullDefault(chatId, setting)
             if (key in overrides) value = overrides[key]
             if (typeof setting.apiTransform === 'function') {
@@ -195,6 +195,9 @@ export class ChatRequest {
               if (opts.maxTokens) value = opts.maxTokens // only as large as requested
               if (value > maxAllowed || value < 1) value = null // if over max model, do not define max
               if (value) value = Math.floor(value)
+              if (chatSettings.model === 'o1-preview' || chatSettings.model === 'o1-mini') {
+                key = 'max_completion_tokens';
+              }
             }
             if (key === 'n') {
               if (opts.streaming || opts.summaryRequest) {
