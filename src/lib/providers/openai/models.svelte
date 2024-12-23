@@ -57,6 +57,12 @@ const chatModelBase = {
 } as ModelDetail
 
 // Reference: https://openai.com/pricing#language-models
+const placeholder = {
+      ...chatModelBase,
+      prompt: 0.0, // $0.0015 per 1000 tokens prompt
+      completion: 0.0, // $0.002 per 1000 tokens completion
+      max: 100000 // 4k max token buffer
+}
 const gpt35 = {
       ...chatModelBase,
       prompt: 0.0000015, // $0.0015 per 1000 tokens prompt
@@ -111,14 +117,24 @@ const o1mini = {
       completion: 0.00003, // $0.03 per 1000 tokens completion
       max: 131072 // 128k max token buffer
 }
-
 const llama3 = {
   ...chatModelBase,
   prompt: 0.00003,
   completion: 0.00006,
   max: 8192
 }
-
+const claude35sonnet = {
+      ...chatModelBase,
+      prompt: 0.00000375, // $0.00375 per 1000 tokens prompt
+      completion: 0.000015, // $0.015 per 1000 tokens completion
+      max: 8192 // 4k max token buffer
+}
+const claude35haiku = {
+      ...chatModelBase,
+      prompt: 1/1_000_000, // $0.001 per 1000 tokens prompt
+      completion: 4/1_000_000, // $0.004 per 1000 tokens completion
+      max: 4096 // 4k max token buffer
+}
 export const chatModels : Record<string, ModelDetail> = {
   'gpt-3.5-turbo': { ...gpt3516k },
   'gpt-3.5-turbo-0301': { ...gpt35 },
@@ -143,9 +159,11 @@ export const chatModels : Record<string, ModelDetail> = {
   'gpt-4-32k-0314': { ...gpt432k },
   'o1-preview': { ...o1preview },
   'o1-mini': { ...o1mini },
-  'mixtral-8x7b-32768': { ...llama3 }, 
+  'mixtral-8x7b-32768': { ...llama3 },
   'llama3-70b-8192': { ...llama3 },
-  'llama3-8b-8192': { ...llama3 }
+  'llama3-8b-8192': { ...llama3 },
+  'claude-3-5-sonnet-20241022': { ...claude35sonnet },
+  'claude-3-5-haiku-20241022': { ...claude35haiku }
 }
 
 const imageModelBase = {
