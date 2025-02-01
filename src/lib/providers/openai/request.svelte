@@ -13,6 +13,7 @@ export const chatRequest = async (
   opts: ChatCompletionOpts): Promise<ChatCompletionResponse> => {
     // OpenAI Request
       const model = chatRequest.getModel()
+      const modelDetail = getModelDetail(model)
       const signal = chatRequest.controller.signal
       const abortListener = (e:Event) => {
         chatRequest.updating = false
@@ -31,7 +32,12 @@ export const chatRequest = async (
         signal
       }
 
-      if (opts.streaming) {
+      if (modelDetail.stream === false) {
+        opts.streaming = false;
+        console.log("Disabled streaming on reasoning models.");
+      }
+
+      if (opts.streaming && !modelDetail.stream) {
       /**
              * Streaming request/response
              * We'll get the response a token at a time, as soon as they are ready

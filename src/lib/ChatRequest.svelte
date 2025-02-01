@@ -195,7 +195,7 @@ export class ChatRequest {
               if (opts.maxTokens) value = opts.maxTokens // only as large as requested
               if (value > maxAllowed || value < 1) value = null // if over max model, do not define max
               if (value) value = Math.floor(value)
-              if (chatSettings.model === 'o1-preview' || chatSettings.model === 'o1-mini') {
+              if (modelDetail.reasoning == true) {
                 key = 'max_completion_tokens';
               }
             }
@@ -213,7 +213,7 @@ export class ChatRequest {
             if (value !== null) acc[key] = value
             return acc
           }, {}),
-          stream: opts.streaming
+          stream: modelDetail.reasoning ? false : opts.streaming
         }
 
         // Make the chat completion request
