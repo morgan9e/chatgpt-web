@@ -285,6 +285,13 @@
     chatRequest.updating = false
     chatRequest.updatingMessage = ''
 
+
+    const userMessagesCount = chat.messages.filter(message => message.role === "user").length;
+    const assiMessagesCount = chat.messages.filter(message => message.role === "assistant").length;
+    if (userMessagesCount == 3 && chat.name.startsWith("Chat ")) {
+      suggestName();
+    }
+    
     focusInput()
   }
 
@@ -295,8 +302,11 @@
       uuid: uuidv4()
     }
 
-    const suggestMessages = $currentChatMessages.slice(0, 10) // limit to first 10 messages
+    const suggestMessages = $currentChatMessages.slice(0, 4)
     suggestMessages.push(suggestMessage)
+
+    const currentModel = chat.settings.model;
+    chat.settings.model = "gpt-4o";
 
     chatRequest.updating = true
     chatRequest.updatingMessage = 'Getting suggestion for chat name...'
@@ -307,6 +317,8 @@
       summaryRequest: true,
       maxTokens: 30
     })
+
+    chat.settings.model = currentModel;
 
     try {
       await response.promiseToFinish()
