@@ -107,7 +107,6 @@ const gpt4128kpreview = {
 }
 const o1preview = {
       ...chatModelBase,
-      stream: false,
       reasoning: true,
       prompt: 0.00001, // $0.01 per 1000 tokens prompt
       completion: 0.00003, // $0.03 per 1000 tokens completion
@@ -115,7 +114,6 @@ const o1preview = {
 }
 const o1mini = {
       ...chatModelBase,
-      stream: false,
       reasoning: true,
       prompt: 0.00001, // $0.01 per 1000 tokens prompt
       completion: 0.00003, // $0.03 per 1000 tokens completion
@@ -123,7 +121,6 @@ const o1mini = {
 }
 const o1 = {
       ...chatModelBase,
-      stream: false,
       reasoning: true,
       prompt: 15 / 1_000_000,
       completion: 60 / 1_000_000,
@@ -131,18 +128,17 @@ const o1 = {
 }
 const o3mini = {
       ...chatModelBase,
-      stream: false,
       reasoning: true,
       prompt: 1.1 / 1_000_000,
       completion: 4.4 / 1_000_000,
       max: 200000
 }
 const llama3 = {
-  ...chatModelBase,
-  prompt: 0.00003,
-  completion: 0.00006,
-  max: 8192
-}
+        ...chatModelBase,
+        prompt: 0.00003,
+        completion: 0.00006,
+        max: 8192
+      }
 const claude35sonnet = {
       ...chatModelBase,
       prompt: 0.00000375, // $0.00375 per 1000 tokens prompt
@@ -180,13 +176,47 @@ export const chatModels : Record<string, ModelDetail> = {
   'gpt-4-32k-0314': { ...gpt432k },
   'o1-preview': { ...o1preview },
   'o1-mini': { ...o1mini },
-  'o1': { ...o1 },
-  'o3-mini': { ...o3mini },
-  'mixtral-8x7b-32768': { ...llama3 },
-  'llama3-70b-8192': { ...llama3 },
-  'llama3-8b-8192': { ...llama3 },
-  'claude-3-5-sonnet-20241022': { ...claude35sonnet },
-  'claude-3-5-haiku-20241022': { ...claude35haiku }
+  'o1': {
+      ...chatModelBase,
+      reasoning: true,
+      prompt:     15 / 1_000_000,
+      completion: 60 / 1_000_000,
+      max:        200000
+  },
+  'o3-mini': {
+      ...chatModelBase,
+      reasoning:  true,
+      prompt:     1.1 / 1_000_000,
+      completion: 4.4 / 1_000_000,
+      max:        200000
+  },
+  'claude-3-5-sonnet-20241022': {
+      ...chatModelBase,
+      prompt:     3.75 / 1_000_000,
+      completion: 15.0 / 1_000_000,
+      max:        8192
+  },
+  'claude-3-5-haiku-20241022': {
+      ...chatModelBase,
+      prompt:     1 / 1_000_000,
+      completion: 4 / 1_000_000,
+      max:        4096
+  },
+  'deepseek-r1-distill-qwen-32b': {
+      ...chatModelBase,
+      prompt:     0.69 / 1_000_000,
+      completion: 0.69 / 1_000_000,
+      max:        16384
+  },
+  'deepseek-r1-distill-llama-70b': {
+      ...chatModelBase,
+      prompt:     3 / 1_000_000,
+      completion: 3 / 1_000_000,
+      max:        4096
+  },
+  // 'mixtral-8x7b-32768': { ...llama3 },
+  // 'llama3-70b-8192': { ...llama3 },
+  // 'llama3-8b-8192': { ...llama3 },
 }
 
 const imageModelBase = {

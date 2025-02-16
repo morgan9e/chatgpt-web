@@ -176,6 +176,21 @@
     }
   }
 
+  const takeReason = (msg) => {
+    if(isAssistant) {
+      const regex = /<think>([\s\S]*?)<\/think>/;
+      const match = msg.match(regex);
+      
+      if (match) {
+        message.reason = match[1];
+        msg = msg.replace(regex, '');
+      }
+    } else {
+      message.reason = "";
+    }
+    return msg;
+  };
+
   let waitingForTruncateConfirm:any = 0
 
   const checkTruncate = () => {
@@ -302,7 +317,6 @@
     {:else}
       <div 
         class="message-display" 
-         
         on:touchend={editOnDoubleTap}
           on:dblclick|preventDefault={() => edit()}
         >
@@ -310,8 +324,17 @@
         <p><b>Summarizing...</b></p>
         {/if}
         {#key refreshCounter}
+        {#if message.reason}
+        <details>
+          <summary>Reasoning..</summary>
+            <div style="background-color:#333;padding:10px;">
+              <SvelteMarkdown source={message.reason}/>
+            </div>
+        </details>
+        <br/>
+        {/if}
         <SvelteMarkdown 
-          source={replaceLatexDelimiters(displayMessage)}
+          source={takeReason(replaceLatexDelimiters(displayMessage))}
           options={markdownOptions}
           renderers={renderers}
         />

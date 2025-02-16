@@ -213,7 +213,7 @@ export class ChatRequest {
             if (value !== null) acc[key] = value
             return acc
           }, {}),
-          stream: modelDetail.reasoning ? false : opts.streaming
+          stream: modelDetail.stream ? false : opts.streaming
         }
 
         // Make the chat completion request

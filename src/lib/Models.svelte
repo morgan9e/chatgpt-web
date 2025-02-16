@@ -155,11 +155,13 @@ export async function getChatModelOptions (): Promise<SelectOption[]> {
       const model = models[i]
       const modelDetail = getModelDetail(model)
       await modelDetail.check(modelDetail)
-      result.push({
-        value: model,
-        text: modelDetail.label || model,
-        disabled: !modelDetail.enabled
-      })
+      if(modelDetail.enabled){
+          result.push({
+            value: model,
+            text: modelDetail.label || model,
+            disabled: !modelDetail.enabled
+          })
+      }
     }
     return result
 }
