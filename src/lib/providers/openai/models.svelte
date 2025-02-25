@@ -190,6 +190,12 @@ export const chatModels : Record<string, ModelDetail> = {
       completion: 4.4 / 1_000_000,
       max:        200000
   },
+  'claude-3-7-sonnet-20250219': {
+      ...chatModelBase,
+      prompt:     3 / 1_000_000,
+      completion: 15 / 1_000_000,
+      max:        8192
+  },
   'claude-3-5-sonnet-20241022': {
       ...chatModelBase,
       prompt:     3.75 / 1_000_000,
