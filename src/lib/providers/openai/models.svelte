@@ -9,6 +9,7 @@
   import { checkModel } from "./util.svelte";
   import { encode } from "gpt-tokenizer";
   import { get } from "svelte/store";
+  import chatModelsJson from './models.json';
 
   const hiddenSettings = {
       startSequence: true,
@@ -45,7 +46,7 @@
       },
       countPromptTokens: (prompts: Message[], model: Model, chat: Chat): number => {
           return (
-              prompts.reduce((a, m) => {
+              prompts.reduce((a, m) => {  
                   a += countMessageTokens(m, model, chat);
                   return a;
               }, 0) + 3
@@ -53,92 +54,17 @@
       },
   } as ModelDetail;
 
-  export const chatModels: Record<string, ModelDetail> = {
+  export const chatModels: Record<string, ModelDetail> = {};
 
-      // OpenAI Models
-
-      "gpt-4o-mini": {
-          ...chatModelBase,
-          prompt:     0.15 / 1_000_000,
-          completion: 0.6  / 1_000_000,
-          max:        131072,
-      },
-      "gpt-4o": {
-          ...chatModelBase,
-          prompt:     2.5 / 1_000_000,
-          completion: 10  / 1_000_000,
-          max:        131072,
-      },
-      "gpt-4.1": {
-          ...chatModelBase,
-          prompt:     2.0 / 1_000_000,
-          completion: 8.0 / 1_000_000,
-          max:        131072,
-      },
-      "gpt-4.1-mini": {
-          ...chatModelBase,
-          prompt:     0.4 / 1_000_000,
-          completion: 1.6 / 1_000_000,
-          max:        131072,
-      },
-      "o1-mini": {
-          ...chatModelBase,
-          reasoning: true,
-          prompt:     1.1 / 1_000_000,
-          completion: 4.4 / 1_000_000,
-          max:        131072,
-      },
-      "o1": {
-          ...chatModelBase,
-          reasoning: true,
-          prompt:     15 / 1_000_000,
-          completion: 60 / 1_000_000,
-          max:        200000,
-      },
-      "o3-mini": {
-          ...chatModelBase,
-          reasoning: true,
-          prompt:     1.1 / 1_000_000,
-          completion: 4.4 / 1_000_000,
-          max:        200000,
-      },
-
-      // Anthropic Models
-
-      "claude-3-7-sonnet-20250219": {
-          ...chatModelBase,
-          prompt:     3  / 1_000_000,
-          completion: 15 / 1_000_000,
-          max:        200000,
-      },
-      "claude-3-5-sonnet-20241022": {
-          ...chatModelBase,
-          prompt:     3.75 / 1_000_000,
-          completion: 15.0 / 1_000_000,
-          max:        200000,
-      },
-      "claude-3-5-haiku-20241022": {
-          ...chatModelBase,
-          prompt:     1 / 1_000_000,
-          completion: 4 / 1_000_000,
-          max:        200000,
-      },
-
-      // Groq Models
-
-      "deepseek-r1-distill-qwen-32b": {
-          ...chatModelBase,
-          prompt:     0.69 / 1_000_000,
-          completion: 0.69 / 1_000_000,
-          max:        16384,
-      },
-      "deepseek-r1-distill-llama-70b": {
-          ...chatModelBase,
-          prompt:     3 / 1_000_000,
-          completion: 3 / 1_000_000,
-          max:        4096,
-      },
-  };
+  for (const [key, { prompt, completion, max, reasoning }] of Object.entries(chatModelsJson)) {
+    chatModels[key] = {
+      ...chatModelBase,
+      prompt: prompt / 1_000_000,
+      completion: completion / 1_000_000,
+      max,
+      ...(reasoning ? { reasoning } : {}),
+    };
+  }
 
   const imageModelBase = {
       type: "image",
