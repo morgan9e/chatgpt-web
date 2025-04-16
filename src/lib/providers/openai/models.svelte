@@ -69,10 +69,16 @@
           completion: 10  / 1_000_000,
           max:        131072,
       },
-      "gpt-4.5-preview": {
+      "gpt-4.1": {
           ...chatModelBase,
-          prompt:     75  / 1_000_000,
-          completion: 150 / 1_000_000,
+          prompt:     2.0 / 1_000_000,
+          completion: 8.0 / 1_000_000,
+          max:        131072,
+      },
+      "gpt-4.1-mini": {
+          ...chatModelBase,
+          prompt:     0.4 / 1_000_000,
+          completion: 1.6 / 1_000_000,
           max:        131072,
       },
       "o1-mini": {
