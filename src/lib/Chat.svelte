@@ -306,7 +306,7 @@
     suggestMessages.push(suggestMessage)
 
     const currentModel = chat.settings.model;
-    chat.settings.model = "gpt-4o";
+    // chat.settings.model = "gpt-4o";
 
     chatRequest.updating = true
     chatRequest.updatingMessage = 'Getting suggestion for chat name...'
