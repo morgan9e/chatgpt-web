@@ -35,7 +35,6 @@
   
   const renderers = {
     code: Code,
-    html: Code,
     codespan: Codespan
   }
 
