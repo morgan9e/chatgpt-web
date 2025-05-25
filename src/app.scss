@@ -1,3 +1,79 @@
+/* USER STYLE START */
+
+h1 {
+  font-size: 1.4em !important;
+}
+
+h2 {
+  font-size: 1.3em !important;
+}
+
+h3 {
+  font-size: 1.2em !important;
+}
+
+body, button, input, select, textarea, .content{
+  font-family: "Lato", "Source Sans 3", Fira Sans, sans-serif !important;
+  letter-spacing: 0.2px !important;
+}
+
+.content {
+  font-size: 17px !important;
+}
+
+code {
+  font-family: "Cascadia Code SemiLight", monospace !important;
+  font-size: 14px !important;
+}
+
+.katex>math[display="block"] {
+  margin: 22px 0 22px 0;
+  display: block; 
+}
+
+.menu-list {
+    line-height: 1.6 !important;
+}
+
+.chat-menu-item .chat-item-name {
+    mask-image: linear-gradient(to right,rgb(0,0,0) 90%,rgba(0,0,0,0)) !important;
+}
+
+:root {
+    --BgColorDark: #181818;
+    --BgColorSidebarDark: #121212;
+}
+
+body { background-color: var(--BgColorDark) !important }
+
+.user-message {
+    border: solid #323232 2px;
+    background-color: #101010 !important;
+}
+
+.tool-drawer, .tool-drawer-mask {
+    min-height: 0 !important;
+}
+
+.user-message .tool-drawer {
+    border: solid #323232 1px;
+    background-color: #101010 !important;
+    
+}
+
+.assistant-message .tool-drawer {
+    border: solid #323232 1px !important;
+    background-color: #181818 !important;
+    
+}
+
+.assistant-message {
+    border: none !important;
+    background-color: #181818 !important;
+}
+
+/* USER STYLE END */
+
 html {
   /* Scrollbar */
   /* TODO: Update these to use bulma's scss variables, not css vars. */
