@@ -56,13 +56,14 @@
 
   export const chatModels: Record<string, ModelDetail> = {};
 
-  for (const [key, { prompt, completion, max, reasoning }] of Object.entries(chatModelsJson)) {
+  for (const [key, { prompt, completion, max, reasoning, alias }] of Object.entries(chatModelsJson)) {
     chatModels[key] = {
       ...chatModelBase,
       prompt: prompt / 1_000_000,
       completion: completion / 1_000_000,
       max,
       ...(reasoning ? { reasoning } : {}),
+      ...(alias ? { alias } : {}),
     };
   }
 
