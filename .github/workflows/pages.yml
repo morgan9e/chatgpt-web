@@ -23,7 +23,7 @@ jobs:
           node-version: '20'
 
       - name: Build
-        run: npm ci && npm run build:github
+        run: npm ci && npm run build
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
