@@ -7,7 +7,7 @@
   import SvelteMarkdown from 'svelte-markdown'
   import type { Message, Model, Chat } from './Types.svelte'
   import Fa from 'svelte-fa/src/fa.svelte'
-  import { faTrash, faDiagramPredecessor, faDiagramNext, faCircleCheck, faPaperPlane, faEye, faEyeSlash, faEllipsis, faDownload, faClipboard, faSquareRootVariable } from '@fortawesome/free-solid-svg-icons/index'
+  import { faTrash, faDiagramPredecessor, faDiagramNext, faCircleCheck, faPaperPlane, faEye, faEyeSlash, faEllipsis, faDownload, faClipboard, faPenToSquare, faSquareRootVariable } from '@fortawesome/free-solid-svg-icons/index'
   import { errorNotice, scrollToMessage } from './Util.svelte'
   import { openModal } from 'svelte-modals'
   import PromptConfirm from './PromptConfirm.svelte'
@@ -348,8 +348,8 @@ const replaceLatexDelimiters = (text: string): string => {
     {:else}
       <div 
         class="message-display" 
-        on:touchend={editOnDoubleTap}
-          on:dblclick|preventDefault={() => edit()}
+          on:touchend={editOnDoubleTap}
+          on:dblclick|preventDefault={() => {if(isUser){edit()}}}
         >
         {#if message.summary && !message.summary.length}
         <p><b>Summarizing...</b></p>
@@ -422,6 +422,18 @@ const replaceLatexDelimiters = (text: string): string => {
       >
       <span class="icon"><Fa icon={faDiagramPredecessor} /></span>
       </a>
+      {/if}
+      {#if !isImage}
+        <a
+          href={'#'}
+          title="Edit"
+          class="msg-image button is-small"
+          on:click|preventDefault={() => {
+            edit()
+          }}
+        >
+        <span class="icon"><Fa icon={faPenToSquare} /></span>
+        </a>
       {/if}
       {#if !message.summarized}
       <a

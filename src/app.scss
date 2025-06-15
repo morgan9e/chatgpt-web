@@ -13,7 +13,7 @@ h3 {
 }
 
 body, button, input, select, textarea, .content{
-  font-family: "Lato", "Source Sans 3", Fira Sans, sans-serif !important;
+  font-family: sans-serif !important;
   letter-spacing: 0.2px !important;
 }
 
@@ -22,7 +22,7 @@ body, button, input, select, textarea, .content{
 }
 
 code {
-  font-family: "Cascadia Code SemiLight", monospace !important;
+  font-family: monospace !important;
   font-size: 14px !important;
 }
 
@@ -87,10 +87,9 @@ html {
   /* Back-ground */
   --BgColorDark: hsl(228, 10%, 10%);
   --BgColorLight: hsl(0, 0%, 100%);
-  // --BgColorSidebarDark: rgb(28, 30, 36);
   --BgColorSidebarDark: rgb(16, 17, 22);
   --BgColorSidebarLight: hsla(0, 0%, 93%, 0.354);
-  // Tool drawer for messages
+  
   --chatToolDrawerSize: 40px;
   --chatToolDrawerColor: var(--BgColorSidebarLight);
   
@@ -115,10 +114,8 @@ html {
   --BgColor: var(-BgColorLight);
   --running-totals: 0;
 
-}
-
-body, button, input, select, textarea {
-  font-family: "Noto Sans", "Source Sans 3", "Fira Sans", sans-serif !important;
+  --fontMain:   "Noto Sans";
+  --fontCode: "Cascadia Code";
 
 }
 
@@ -317,13 +314,12 @@ select option.is-default {
 }
 
 .content {
-  font-family: "Noto Sans", "Source Sans 3", "Fira Sans", sans-serif !important;
   font-size: 15px;
   line-height: 30px;
 }
 
 .code {
-  font-family: "Monaco", "Hack", monospace !important;
+  font-family: monospace !important;
 }
 /* Style the chat input */
 .chat-input {
