@@ -13,7 +13,8 @@
   import PromptConfirm from './PromptConfirm.svelte'
   import { getImage } from './ImageStore.svelte'
   import { getModelDetail } from './Models.svelte'
-
+  import renderMathInElement from "https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.mjs";
+    
   export let message:Message
   export let chatId:number
   export let chat:Chat
@@ -235,52 +236,83 @@
     document.body.removeChild(a)
   }
 
-  const replaceLatexDelimiters = (text: string): string => {
-    let result = '';
-    let i = 0;
+const replaceLatexDelimiters = (text: string): string => {
+  let result = '';
+  let i = 0;
 
-    while (i < text.length) {
-      if (text.startsWith('\\(', i)) {
-        let endPos = text.indexOf('\\)', i + 2);
-        if (endPos === -1) {
-          console.error(`LaTeX: Delimiter mismatch at ${i}`)
-          result += text[i];
-          i++;
-        } else {
-          result += '`\\(' + text.slice(i + 2, endPos) + '\\)`';
-          i = endPos + 2;
-        }
-      } else if (text.startsWith('\\[', i)) {
-        let endPos = text.indexOf('\\]', i + 2);
-        if (endPos === -1) {
-          console.error(`LaTeX: Delimiter mismatch at ${i}`)
-          result += text[i];
-          i++;
-        } else {
-          result += `\`\\[${text.slice(i + 2, endPos)}\\]\``;
-          i = endPos + 2;
-        }
+  while (i < text.length) {
+    // Check for display math: $$ ... $$
+    if (text.startsWith('$$', i)) {
+      const endPos = text.indexOf('$$', i + 2);
+      if (endPos === -1) {
+        console.error(`LaTeX: Delimiter mismatch (missing $$) at position ${i}`);
+        result += text[i];
+        i++;
       } else {
-        if (text.startsWith('\\(', i)) {
-          result += '\\(';
-          i += 2;
-        } else if (text.startsWith('\\)', i)) {
-          result += '\\)';
-          i += 2;
-        } else if (text.startsWith('\\[', i)) {
-          result += '\\[';
-          i += 2;
-        } else if (text.startsWith('\\]', i)) {
-          result += '\\]';
-          i += 2;
-        } else {
-          result += text[i];
-          i++;
-        }
+        // Wrap in backticks for KaTeX
+        result += `\`\\[${text.slice(i + 2, endPos)}\\]\``;
+        i = endPos + 2;
       }
     }
-    return result
+    // Check for inline math: $ ... $
+    else if (text.startsWith('$', i)) {
+      const endPos = text.indexOf('$', i + 1);
+      if (endPos === -1) {
+        console.error(`LaTeX: Delimiter mismatch (missing $) at position ${i}`);
+        result += text[i];
+        i++;
+      } else {
+        result += `\`$${text.slice(i + 1, endPos)}$\``;
+        i = endPos + 1;
+      }
+    }
+    // Check for inline math: \(...\)
+    else if (text.startsWith('\\(', i)) {
+      const endPos = text.indexOf('\\)', i + 2);
+      if (endPos === -1) {
+        console.error(`LaTeX: Delimiter mismatch (missing \\)) at position ${i}`);
+        result += text[i];
+        i++;
+      } else {
+        result += '`\\(' + text.slice(i + 2, endPos) + '\\)`';
+        i = endPos + 2;
+      }
+    }
+    // Check for display math: \[...\]
+    else if (text.startsWith('\\[', i)) {
+      const endPos = text.indexOf('\\]', i + 2);
+      if (endPos === -1) {
+        console.error(`LaTeX: Delimiter mismatch (missing \\]) at position ${i}`);
+        result += text[i];
+        i++;
+      } else {
+        result += `\`\\[${text.slice(i + 2, endPos)}\\]\``;
+        i = endPos + 2;
+      }
+    }
+    // Otherwise, just copy the current character (also handling backslash escapes)
+    else {
+      if (text.startsWith('\\(', i)) {
+        result += '\\(';
+        i += 2;
+      } else if (text.startsWith('\\)', i)) {
+        result += '\\)';
+        i += 2;
+      } else if (text.startsWith('\\[', i)) {
+        result += '\\[';
+        i += 2;
+      } else if (text.startsWith('\\]', i)) {
+        result += '\\]';
+        i += 2;
+      } else {
+        result += text[i];
+        i++;
+      }
+    }
   }
+  return result;
+};
+
 
   const renderMathMsg = () => {
     displayMessage = replaceLatexDelimiters(message.content);

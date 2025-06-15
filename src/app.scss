@@ -31,6 +31,11 @@ code {
   display: block; 
 }
 
+.katex-display {
+    margin: 2em 0;
+    max-width: 1000px;
+}
+
 .menu-list {
     line-height: 1.6 !important;
 }
