@@ -14,8 +14,8 @@
             {left: '$', right: '$', display: false},
             {left: '$$', right: '$$', display: true}
         ],
-        throwOnError : false
-        // output: "mathml"
+        throwOnError : false,
+        output: "html"
       })
     renderedMath = dummy.innerHTML;
     dummy.remove();
