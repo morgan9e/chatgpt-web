@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sed -i "s/&&&BUILDVER&&&/$(TZ=Asia/Tokyo date +'%y%m%d_%H%M%S')/" src/lib/Sidebar.svelte
+sed -i "s/&&&BUILDVER&&&/$(TZ=Asia/Tokyo date +'%y-%m-%d %H:%M:%S')/" src/lib/Sidebar.svelte
