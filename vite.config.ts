@@ -18,7 +18,7 @@ const plugins = [
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode, ssrBuild }) => {
   // Only run PurgeCSS in production builds
-  if (command === 'build') {
+  if (command === 'builds') {
     return {
       plugins,
       css: {
