@@ -242,7 +242,7 @@ const replaceLatexDelimiters = (text: string): string => {
 
   while (i < text.length) {
     // Check for display math: $$ ... $$
-    if (text.startsWith('$$', i)) {
+    if (text.startsWith('$$aaaaaaaa', i)) {
       const endPos = text.indexOf('$$', i + 2);
       if (endPos === -1) {
         console.error(`LaTeX: Delimiter mismatch (missing $$) at position ${i}`);
@@ -255,7 +255,7 @@ const replaceLatexDelimiters = (text: string): string => {
       }
     }
     // Check for inline math: $ ... $
-    else if (text.startsWith('$', i)) {
+    else if (text.startsWith('$aaaaaaaaa', i)) {
       const endPos = text.indexOf('$', i + 1);
       if (endPos === -1) {
         console.error(`LaTeX: Delimiter mismatch (missing $) at position ${i}`);
