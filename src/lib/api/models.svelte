@@ -1,10 +1,10 @@
 <script context="module" lang="ts">
 
-  import { getApiBase, getEndpointCompletions, getEndpointGenerations } from '../../ApiUtil.svelte'
-  import { countTokens } from '../../Models.svelte'
-  import { countMessageTokens } from '../../Stats.svelte'
-  import { globalStorage } from '../../Storage.svelte'
-  import type { Chat, Message, Model, ModelDetail } from '../../Types.svelte'
+  import { getApiBase, getEndpointCompletions, getEndpointGenerations } from '../ApiUtil.svelte'
+  import { countTokens } from '../Models.svelte'
+  import { countMessageTokens } from '../Stats.svelte'
+  import { globalStorage } from '../Storage.svelte'
+  import type { Chat, Message, Model, ModelDetail } from '../Types.svelte'
   import { chatRequest, imageRequest } from './request.svelte'
   import { checkModel } from './util.svelte'
   // Lazy-load tokenizer to improve initial load time

@@ -1,10 +1,10 @@
 <script context="module" lang="ts">
     import { EventStreamContentType, fetchEventSource } from '@microsoft/fetch-event-source'
-    import { ChatCompletionResponse } from '../../ChatCompletionResponse.svelte'
-    import { ChatRequest } from '../../ChatRequest.svelte'
-    import { getEndpoint, getModelDetail } from '../../Models.svelte'
-    import { getApiKey } from '../../Storage.svelte'
-    import type { ChatCompletionOpts, Request } from '../../Types.svelte'
+    import { ChatCompletionResponse } from '../ChatCompletionResponse.svelte'
+    import { ChatRequest } from '../ChatRequest.svelte'
+    import { getEndpoint, getModelDetail } from '../Models.svelte'
+    import { getApiKey } from '../Storage.svelte'
+    import type { ChatCompletionOpts, Request } from '../Types.svelte'
 
 export const chatRequest = async (
   request: Request,

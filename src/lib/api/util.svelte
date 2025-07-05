@@ -1,8 +1,8 @@
 <script context="module" lang="ts">
-    import { apiKeyStorage } from '../../Storage.svelte'
+    import { apiKeyStorage } from '../Storage.svelte'
     import { get } from 'svelte/store'
-    import type { ModelDetail } from '../../Types.svelte'
-    import { getApiBase, getEndpointModels } from '../../ApiUtil.svelte'
+    import type { ModelDetail } from '../Types.svelte'
+    import { getApiBase, getEndpointModels } from '../ApiUtil.svelte'
 
 type ResponseModels = {
   object?: string;
