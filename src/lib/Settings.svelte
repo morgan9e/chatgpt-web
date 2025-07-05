@@ -63,7 +63,7 @@ export const getExcludeFromProfile = () => {
   return excludeFromProfile
 }
 
-const hideModelSetting = (chatId: number, setting: ChatSetting) => {
+const hideModelSetting = (chatId: string, setting: ChatSetting) => {
   return getModelDetail(getChatSettings(chatId).model).hideSetting(chatId, setting)
 }
 
@@ -142,9 +142,9 @@ const excludeFromProfile = {
 
 export const chatSortOptions = {
   name: { text: 'Name', icon: faArrowDownAZ, value: '', sortFn: (a, b) => { return a.name < b.name ? -1 : a.name > b.name ? 1 : 0 } },
-  created: { text: 'Created', icon: faArrowDown91, value: '', sortFn: (a, b) => { return ((b.created || 0) - (a.created || 0)) || (b.id - a.id) } },
-  lastUse: { text: 'Last Use', icon: faArrowDown91, value: '', sortFn: (a, b) => { return ((b.lastUse || 0) - (a.lastUse || 0)) || (b.id - a.id) } },
-  lastAccess: { text: 'Last View', icon: faArrowDown91, value: '', sortFn: (a, b) => { return ((b.lastAccess || 0) - (a.lastAccess || 0)) || (b.id - a.id) } }
+  created: { text: 'Created', icon: faArrowDown91, value: '', sortFn: (a, b) => { return ((b.created || 0) - (a.created || 0)) || a.id.localeCompare(b.id) } },
+  lastUse: { text: 'Last Use', icon: faArrowDown91, value: '', sortFn: (a, b) => { return ((b.lastUse || 0) - (a.lastUse || 0)) || a.id.localeCompare(b.id) } },
+  lastAccess: { text: 'Last View', icon: faArrowDown91, value: '', sortFn: (a, b) => { return ((b.lastAccess || 0) - (a.lastAccess || 0)) || a.id.localeCompare(b.id) } }
 } as Record<string, ChatSortOption>
 
 Object.entries(chatSortOptions).forEach(([k, o]) => { o.value = k })

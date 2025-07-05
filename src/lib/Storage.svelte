@@ -5,7 +5,7 @@
   import { getChatSettingObjectByKey, getGlobalSettingObjectByKey, getChatDefaults, getExcludeFromProfile, chatSortOptions, globalDefaults } from './Settings.svelte'
   import { v4 as uuidv4 } from 'uuid'
   import { getProfile, getProfiles, isStaticProfile, newNameForProfile, restartProfile } from './Profiles.svelte'
-  import { errorNotice } from './Util.svelte'
+  import { errorNotice, generateShortId } from './Util.svelte'
   import { clearAllImages, deleteImage, setImage } from './ImageStore.svelte'
 
   // TODO: move chatsStorage to indexedDB with localStorage as a fallback for private browsing.
@@ -22,8 +22,8 @@
   export let continueMessage = writable('') //
   export let currentChatMessages = writable([] as Message[])
   export let started = writable(false)
-  export let currentChatId = writable(0)
-  export let lastChatId = persisted('lastChatId', 0)
+  export let currentChatId = writable('')
+  export let lastChatId = persisted('lastChatId', '')
 
   const chatDefaults = getChatDefaults()
   
@@ -31,25 +31,22 @@
     return get(apiKeyStorage)
   }
 
-  export const newChatID = (): number => {
-    const chats = get(chatsStorage)
-    const chatId = chats.reduce((maxId, chat) => Math.max(maxId, chat.id), 0) + 1
-    return chatId
+  export const newChatID = (): string => {
+    return generateShortId()
   }
 
-  export const addChat = (profile:ChatSettings|undefined = undefined): number => {
+  export const addChat = (profile:ChatSettings|undefined = undefined): string => {
     const chats = get(chatsStorage)
 
-    // Find the max chatId
+    // Generate new short UUID
     const chatId = newChatID()
 
     profile = JSON.parse(JSON.stringify(profile || getProfile(''))) as ChatSettings
-    const nameMap = chats.reduce((a, chat) => { a[chat.name] = chat; return a }, {})
 
     // Add a new chat
     chats.push({
       id: chatId,
-      name: newName(`Chat ${chatId}`, nameMap),
+      name: `New Chat`,
       settings: profile,
       messages: [],
       usage: {} as Record<Model, Usage>,
@@ -65,7 +62,7 @@
     return chatId
   }
 
-  export const addChatFromJSON = async (json: string): Promise<number> => {
+  export const addChatFromJSON = async (json: string): Promise<string> => {
     const chats = get(chatsStorage)
 
     // Find the max chatId
@@ -74,13 +71,13 @@
     let chat: Chat
     try {
       chat = JSON.parse(json) as Chat
-      if (!chat.settings || !chat.messages || isNaN(chat.id)) {
+      if (!chat.settings || !chat.messages || !chat.id) {
         errorNotice('Not valid Chat JSON')
-        return 0
+        return ''
       }
     } catch (err) {
       errorNotice("Can't parse file JSON")
-      return 0
+      return ''
     }
 
     chat.id = chatId
@@ -99,7 +96,7 @@
   }
 
   // Make sure a chat's settings are set with current values or defaults
-  export const updateChatSettings = (chatId:number) => {
+  export const updateChatSettings = (chatId:string) => {
     const chats = get(chatsStorage)
     const chat = chats.find((chat) => chat.id === chatId) as Chat
     if (!chat.settings) {
@@ -152,7 +149,7 @@
   }
   
   // Reset all setting to current profile defaults
-  export const resetChatSettings = (chatId, resetAll:boolean = false) => {
+  export const resetChatSettings = (chatId: string, resetAll:boolean = false) => {
     const chats = get(chatsStorage)
     const chat = chats.find((chat) => chat.id === chatId) as Chat
     const profile = getProfile(chat.settings.profile)
@@ -179,17 +176,17 @@
     chatsStorage.set(chats)
   }
 
-  export const getChat = (chatId: number):Chat => {
+  export const getChat = (chatId: string):Chat => {
     const chats = get(chatsStorage)
     return chats.find((chat) => chat.id === chatId) as Chat
   }
 
-  export const getChatSettings = (chatId: number):ChatSettings => {
+  export const getChatSettings = (chatId: string):ChatSettings => {
     const chats = get(chatsStorage)
     return (chats.find((chat) => chat.id === chatId) as Chat).settings
   }
 
-  export const updateRunningTotal = (chatId: number, usage: Usage, model:Model) => {
+  export const updateRunningTotal = (chatId: string, usage: Usage, model:Model) => {
     const chats = get(chatsStorage)
     const chat = chats.find((chat) => chat.id === chatId) as Chat
     let total:Usage = chat.usage[model]
@@ -207,7 +204,7 @@
     chatsStorage.set(chats)
   }
 
-  export const subtractRunningTotal = (chatId: number, usage: Usage, model:Model) => {
+  export const subtractRunningTotal = (chatId: string, usage: Usage, model:Model) => {
     const chats = get(chatsStorage)
     const chat = chats.find((chat) => chat.id === chatId) as Chat
     let total:Usage = chat.usage[model]
@@ -225,17 +222,17 @@
     chatsStorage.set(chats)
   }
 
-  export const getMessages = (chatId: number): Message[] => {
+  export const getMessages = (chatId: string): Message[] => {
     if (get(currentChatId) === chatId) return get(currentChatMessages)
     return getChat(chatId).messages
   }
 
   let setChatTimer: any
-  export const setCurrentChat = (chatId: number) => {
+  export const setCurrentChat = (chatId: string) => {
     clearTimeout(setChatTimer)
     if (!chatId) {
-      currentChatId.set(0)
-      lastChatId.set(0)
+      currentChatId.set('')
+      lastChatId.set('')
       currentChatMessages.set([])
       return
     }
@@ -246,8 +243,8 @@
     }, 10)
   }
 
-  const signalChangeTimers = new Map<number, any>()
-  const setChatLastUse = (chatId: number, time: number) => {
+  const signalChangeTimers = new Map<string, any>()
+  const setChatLastUse = (chatId: string, time: number) => {
     const existingTimer = signalChangeTimers.get(chatId)
     if (existingTimer) {
       clearTimeout(existingTimer)
@@ -260,8 +257,8 @@
     signalChangeTimers.set(chatId, timer)
   }
 
-  const setMessagesTimers = new Map<number, any>()
-  export const setMessages = (chatId: number, messages: Message[]) => {
+  const setMessagesTimers = new Map<string, any>()
+  export const setMessages = (chatId: string, messages: Message[]) => {
     if (get(currentChatId) === chatId) {
       // update current message cache right away
       currentChatMessages.set(messages)
@@ -289,7 +286,7 @@
     }
   }
 
-  export const updateMessages = (chatId: number) => {
+  export const updateMessages = (chatId: string) => {
     setMessages(chatId, getMessages(chatId))
   }
 
@@ -311,11 +308,11 @@
     setMessagesTimers.clear()
   }
 
-  export const addError = (chatId: number, error: string) => {
+  export const addError = (chatId: string, error: string) => {
     addMessage(chatId, { content: error } as Message)
   }
 
-  export const addMessage = (chatId: number, message: Message) => {
+  export const addMessage = (chatId: string, message: Message) => {
     const messages = getMessages(chatId)
     if (!message.uuid) message.uuid = uuidv4()
     if (!message.created) message.created = Date.now()
@@ -326,11 +323,11 @@
     setMessages(chatId, messages)
   }
 
-  export const getMessage = (chatId: number, uuid:string):Message|undefined => {
+  export const getMessage = (chatId: string, uuid:string):Message|undefined => {
     return getMessages(chatId).find((m) => m.uuid === uuid)
   }
 
-  export const insertMessages = (chatId: number, insertAfter: Message, newMessages: Message[]) => {
+  export const insertMessages = (chatId: string, insertAfter: Message, newMessages: Message[]) => {
     const messages = getMessages(chatId)
     const index = messages.findIndex((m) => m.uuid === insertAfter.uuid)
     if (index === undefined || index < 0) {
@@ -345,7 +342,7 @@
     setMessages(chatId, messages.filter(m => true))
   }
 
-  export const deleteSummaryMessage = (chatId: number, uuid: string) => {
+  export const deleteSummaryMessage = (chatId: string, uuid: string) => {
     const message = getMessage(chatId, uuid)
     if (message && message.summarized) throw new Error('Unable to delete summarized message')
     if (message && message.summary) { // messages we summarized
@@ -361,7 +358,7 @@
     deleteMessage(chatId, uuid)
   }
 
-  export const deleteMessage = (chatId: number, uuid: string) => {
+  export const deleteMessage = (chatId: string, uuid: string) => {
     const messages = getMessages(chatId)
     const index = messages.findIndex((m) => m.uuid === uuid)
     const message = getMessage(chatId, uuid)
@@ -379,13 +376,13 @@
     setMessages(chatId, messages.filter(m => true))
   }
 
-  const clearImages = (chatId: number, messages: Message[]) => {
+  const clearImages = (chatId: string, messages: Message[]) => {
     messages.forEach(m => {
       if (m.image) deleteImage(chatId, m.image.id)
     })
   }
 
-  export const truncateFromMessage = (chatId: number, uuid: string) => {
+  export const truncateFromMessage = (chatId: string, uuid: string) => {
     const messages = getMessages(chatId)
     const index = messages.findIndex((m) => m.uuid === uuid)
     const message = getMessage(chatId, uuid)
@@ -398,18 +395,18 @@
     setMessages(chatId, messages.filter(m => true))
   }
 
-  export const clearMessages = (chatId: number) => {
+  export const clearMessages = (chatId: string) => {
     clearImages(chatId, getMessages(chatId))
     setMessages(chatId, [])
   }
 
-  export const deleteChat = (chatId: number) => {
+  export const deleteChat = (chatId: string) => {
     const chats = get(chatsStorage)
     clearImages(chatId, getMessages(chatId) || [])
     chatsStorage.set(chats.filter((chat) => chat.id !== chatId))
   }
 
-  export const updateChatImages = async (chatId: number, chat: Chat) => {
+  export const updateChatImages = async (chatId: string, chat: Chat) => {
     const messages = chat.messages
     for (let i = 0; i < messages.length; i++) {
       const m = messages[i]
@@ -417,7 +414,7 @@
     }
   }
 
-  export const copyChat = async (chatId: number) => {
+  export const copyChat = async (chatId: string) => {
     const chats = get(chatsStorage)
     const chat = chats.find((chat) => chat.id === chatId) as Chat
     const nameMap = chats.reduce((a, chat) => { a[chat.name] = chat; return a }, {})
@@ -454,7 +451,7 @@
     }
   }
   
-  export const setChatSettingValueByKey = (chatId: number, key: keyof ChatSettings, value) => {
+  export const setChatSettingValueByKey = (chatId: string, key: keyof ChatSettings, value) => {
     const setting = getChatSettingObjectByKey(key)
     if (setting) return setChatSettingValue(chatId, setting, value)
     if (!(key in chatDefaults)) throw new Error('Invalid chat setting: ' + key)
@@ -469,7 +466,7 @@
     settings[key] = cleanSettingValue(typeof d, value)
   }
 
-  export const setChatSettingValue = (chatId: number, setting: ChatSetting, value) => {
+  export const setChatSettingValue = (chatId: string, setting: ChatSetting, value) => {
     const chats = get(chatsStorage)
     const chat = chats.find((chat) => chat.id === chatId) as Chat
     let settings = chat.settings as any
@@ -481,7 +478,7 @@
     chatsStorage.set(chats)
   }
 
-  export const getChatSettingValueNullDefault = (chatId: number, setting: ChatSetting):any => {
+  export const getChatSettingValueNullDefault = (chatId: string, setting: ChatSetting):any => {
     const chats = get(chatsStorage)
     const chat = chats.find((chat) => chat.id === chatId) as Chat
     let value = chat.settings && chat.settings[setting.key]
@@ -515,7 +512,7 @@
     return store.profiles || {}
   }
 
-  export const deleteCustomProfile = (chatId:number, profileId:string) => {
+  export const deleteCustomProfile = (chatId:string, profileId:string) => {
     if (isStaticProfile(profileId)) {
       throw new Error('Sorry, you can\'t delete a static profile.')
     }

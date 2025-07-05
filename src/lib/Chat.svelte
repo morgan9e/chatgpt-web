@@ -43,7 +43,7 @@
   import { getModelDetail } from './Models.svelte'
 
   export let params = { chatId: '' }
-  const chatId: number = parseInt(params.chatId)
+  const chatId: string = params.chatId
 
   let chatRequest = new ChatRequest()
   let input: HTMLTextAreaElement
@@ -53,8 +53,8 @@
 
   // Optimize chat lookup to avoid expensive find() on every chats update
   let chat: Chat
-  let chatSettings: ChatSettings
-  let showSettingsModal
+  let chatSettings: any
+  let showSettingsModal: any
 
   // Only update chat when chatId changes or when the specific chat is updated
   $: {
@@ -105,7 +105,7 @@
 
   $: afterChatLoad($currentChatId)
 
-  setCurrentChat(0)
+  setCurrentChat('')
   // Make sure chat object is ready to go
   updateChatSettings(chatId)
 
@@ -303,7 +303,7 @@
 
     const userMessagesCount = chat.messages.filter(message => message.role === 'user').length
     const assiMessagesCount = chat.messages.filter(message => message.role === 'assistant').length
-    if (userMessagesCount == 3 && chat.name.startsWith('Chat ')) {
+    if (userMessagesCount == 3 && chat.name.startsWith('New Chat')) {
       suggestName()
     }
   
@@ -392,7 +392,7 @@
   <div class="level-left">
     <div class="level-item">
       <p class="subtitle is-5">
-        <span>{chat.name || `Chat ${chat.id}`}</span>
+        <span>{chat.name || `New Chat`}</span>
         <a href={'#'} class="greyscale ml-2 is-hidden has-text-weight-bold editbutton" title="Rename chat" on:click|preventDefault={promptRename}><Fa icon={faPenToSquare} /></a>
         <a href={'#'} class="greyscale ml-2 is-hidden has-text-weight-bold editbutton" title="Suggest a chat name" on:click|preventDefault={suggestName}><Fa icon={faLightbulb} /></a>
         <!-- <a href={'#'} class="greyscale ml-2 is-hidden has-text-weight-bold editbutton" title="Copy this chat" on:click|preventDefault={() => { copyChat(chatId) }}><Fa icon={faClone} /></a> -->
@@ -410,7 +410,7 @@
 
 <Messages messages={$currentChatMessages} chatId={chatId} chat={chat} />
 
-{#if chatRequest.updating === true || $currentChatId === 0}
+{#if chatRequest.updating === true || !$currentChatId}
   <article class="message is-success assistant-message">
     <div class="message-body content">
       <span class="is-loading" ></span>
@@ -419,7 +419,7 @@
   </article>
 {/if}
 
-{#if $currentChatId !== 0 && ($currentChatMessages.length === 0 || ($currentChatMessages.length === 1 && $currentChatMessages[0].role === 'system'))}
+{#if $currentChatId && ($currentChatMessages.length === 0 || ($currentChatMessages.length === 1 && $currentChatMessages[0].role === 'system'))}
   <Prompts bind:input />
 {/if}
 </div>

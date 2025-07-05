@@ -95,7 +95,7 @@
     <a class="is-pulled-right is-hidden px-1 py-0 has-text-weight-bold edit-button" href={'$'} on:click|preventDefault={() => edit()}><Fa icon={faPencil} /></a>
     <a class="is-pulled-right is-hidden px-1 py-0 has-text-weight-bold delete-button" href={'$'} on:click|preventDefault={() => delChat()}><Fa icon={faTrash} /></a>
     {/if}
-    <span class="chat-item-name"><Fa class="mr-2 chat-icon" size="xs" icon="{faMessage}"/>{chat.name || `Chat ${chat.id}`}</span>
+    <span class="chat-item-name"><Fa class="mr-2 chat-icon" size="xs" icon="{faMessage}"/>{chat.name || `New Chat`}</span>
   </a>
   {/if}
 </li>

@@ -3,15 +3,18 @@
   import { wrap } from 'svelte-spa-router/wrap'
 
   import Navbar from './lib/Navbar.svelte'
-  import Sidebar from './lib/Sidebar.svelte'
+  import Sidebar, { sidebarCollapsed } from './lib/Sidebar.svelte'
   import Home from './lib/Home.svelte'
   import Chat from './lib/Chat.svelte'
   import NewChat from './lib/NewChat.svelte'
   import { chatsStorage } from './lib/Storage.svelte'
   import { Modals, closeModal } from 'svelte-modals'
-  import { dispatchModalEsc, checkModalEsc } from './lib/Util.svelte'
+  import { dispatchModalEsc, checkModalEsc, migrateChatData } from './lib/Util.svelte'
   import { set as setOpenAI } from './lib/providers/openai/util.svelte'
   import { hasActiveModels } from './lib/Models.svelte'
+
+  // Run migration on app startup to convert old numeric chat IDs to UUIDs
+  migrateChatData()
 
   // Check if the API key is passed in as a "key" query parameter - if so, save it
   // Example: https://niek.github.io/chatgpt-web/#/?key=sk-...
@@ -34,7 +37,7 @@
     '/chat/:chatId': wrap({
       component: Chat,
       conditions: (detail) => {
-        return $chatsStorage.find((chat) => chat.id === parseInt(detail?.params?.chatId as string)) !== undefined
+        return $chatsStorage.find((chat) => chat.id === detail?.params?.chatId as string) !== undefined
       }
     }),
 
@@ -51,10 +54,10 @@
 </script>
 
 <Navbar />
-<div class="side-bar-column">
+<div class="side-bar-column" class:collapsed={$sidebarCollapsed}>
   <Sidebar />
 </div>
-<div class="main-content-column" id="content">
+<div class="main-content-column" class:collapsed={$sidebarCollapsed} id="content">
   {#key $location}
     <Router {routes} on:conditionsFailed={() => replace('/')}/>
   {/key}

@@ -17,11 +17,11 @@ onMount(() => {
       // console.log('started', apiKey, $lastChatId, getChat($lastChatId))
       if (hasActiveModels() && getChat($lastChatId)) {
         const chatId = $lastChatId
-        $lastChatId = 0
+        $lastChatId = ''
         replace(`/chat/${chatId}`)
       }
     }
-    $lastChatId = 0
+    $lastChatId = ''
 })
 
 afterUpdate(() => {

@@ -101,7 +101,7 @@ export type ChatSettings = {
   } & Request;
 
 export type Chat = {
-    id: number;
+    id: string;
     name: string;
     messages: Message[];
     usage: Record<Model, Usage>;

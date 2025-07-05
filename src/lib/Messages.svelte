@@ -5,7 +5,7 @@
   import EditMessage from './EditMessage.svelte'
 
   export let messages : Message[]
-  export let chatId: number
+  export let chatId: string
   export let chat: Chat
   
   $: chatSettings = chat.settings

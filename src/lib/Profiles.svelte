@@ -83,19 +83,19 @@ export const cleanContent = (settings: ChatSettings, content: string|undefined):
     return (content || '').replace(/::NOTE::[\s\S]*?::NOTE::\s*/g, '')
 }
 
-export const prepareProfilePrompt = (chatId:number) => {
+export const prepareProfilePrompt = (chatId:string) => {
     const settings = getChatSettings(chatId)
     return mergeProfileFields(settings, settings.systemPrompt).trim()
 }
 
-export const prepareSummaryPrompt = (chatId:number, maxTokens:number) => {
+export const prepareSummaryPrompt = (chatId:string, maxTokens:number) => {
     const settings = getChatSettings(chatId)
     const currentSummaryPrompt = settings.summaryPrompt
     // ~.75 words per token.  We'll use 0.70 for a little extra margin.
     return mergeProfileFields(settings, currentSummaryPrompt, Math.floor(maxTokens * 0.70)).trim()
 }
 
-export const setSystemPrompt = (chatId: number) => {
+export const setSystemPrompt = (chatId: string) => {
     const messages = getMessages(chatId)
     const systemPromptMessage:Message = {
       role: 'system',
@@ -108,7 +108,7 @@ export const setSystemPrompt = (chatId: number) => {
 }
 
 // Restart currently loaded profile
-export const restartProfile = (chatId:number, noApply:boolean = false) => {
+export const restartProfile = (chatId:string, noApply:boolean = false) => {
     const settings = getChatSettings(chatId)
     if (!settings.profile && !noApply) return applyProfile(chatId, '', true)
     // Clear current messages
@@ -135,7 +135,7 @@ export const newNameForProfile = (name:string) => {
 }
 
 // Apply currently selected profile
-export const applyProfile = (chatId:number, key:string = '', resetChat:boolean = false) => {
+export const applyProfile = (chatId:string, key:string = '', resetChat:boolean = false) => {
     resetChatSettings(chatId, resetChat) // Fully reset
     if (!resetChat) return
     return restartProfile(chatId, true)

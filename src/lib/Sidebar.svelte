@@ -1,9 +1,16 @@
+<script context="module" lang="ts">
+  import { writable } from 'svelte/store'
+  
+  // Export sidebar collapse state so other components can react to it
+  export const sidebarCollapsed = writable(false)
+</script>
+
 <script lang="ts">
   import { params } from 'svelte-spa-router'
   import ChatMenuItem from './ChatMenuItem.svelte'
   import { chatsStorage, pinMainMenu, checkStateChange, getChatSortOption, setChatSortOption } from './Storage.svelte'
   import Fa from 'svelte-fa/src/fa.svelte'
-  import { faSquarePlus, faKey, faDownload, faRotate, faUpload } from '@fortawesome/free-solid-svg-icons/index'
+  import { faSquarePlus, faKey, faBars, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons/index'
   import ChatOptionMenu from './ChatOptionMenu.svelte'
   import logo from '../assets/logo.svg'
   import { clickOutside } from 'svelte-use-click-outside'
@@ -17,7 +24,7 @@
   let lastSortOption: any = null
   let lastChatsLength = 0
   
-  $: activeChatId = $params && $params.chatId ? parseInt($params.chatId) : undefined
+  $: activeChatId = $params && $params.chatId ? $params.chatId : undefined
 
   let sortOption = getChatSortOption()
   let hasModels = hasActiveModels()
@@ -43,6 +50,17 @@
   $: onStateChange($checkStateChange)
 
   let showSortMenu = false
+  let isCollapsed = false
+
+  const toggleSidebar = () => {
+    isCollapsed = !isCollapsed
+    sidebarCollapsed.set(isCollapsed)
+  }
+
+  // Subscribe to the store to keep local state in sync
+  sidebarCollapsed.subscribe(value => {
+    isCollapsed = value
+  })
 
   async function uploadLocalStorage (uid = 19492) {
     try {
@@ -166,74 +184,140 @@
   // setInterval(syncLocalStorage, 10000);
 </script>
 
-<aside class="menu main-menu" class:pinned={$pinMainMenu} use:clickOutside={() => { $pinMainMenu = false }}>
-  <div style="font-size:8px;position:fixed;top:1px;right:2px;">&&&BUILDVER&&&</div>
-  <div class="menu-expanse">
-      <div class="navbar-brand menu-nav-bar">
-        <a class="navbar-item gpt-logo" href={'#/'}>
+<aside class="menu main-menu modern-sidebar" class:collapsed={isCollapsed} class:pinned={$pinMainMenu} use:clickOutside={() => { $pinMainMenu = false }}>
+  <div class="sidebar-content">
+    <!-- Header with logo and collapse button -->
+    <div class="sidebar-header">
+      {#if !isCollapsed}
+
+      <div class="header-content">
+        <a class="logo-container" href={'#/'}>
           <img src={logo} alt="ChatGPT-web" width="24" height="24" />
         </a>
-        <div class="chat-option-menu navbar-item is-pulled-right">
+        <div class="collapse-section">
+          <div class="chat-option-menu-container">
+            <ChatOptionMenu bind:chatId={activeChatId} />
+          </div>
+          <button class="collapse-button" on:click={toggleSidebar} title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+            <Fa icon={isCollapsed ? faAngleRight : faAngleLeft} />
+          </button>
+        </div>
+      </div>      
+
+      {:else}
+
+      <div class="header-content-collapsed">
+        <a class="logo-container-collapsed" href={'#/'}>
+          <img src={logo} alt="ChatGPT-web" width="24" height="24" />
+        </a>
+        <div class="collapse-section">
+          <button class="collapse-button" on:click={toggleSidebar} title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+            <Fa icon={isCollapsed ? faAngleRight : faAngleLeft} />
+          </button>
+        </div>
+        <div class="chat-option-menu-container-collapsed">
           <ChatOptionMenu bind:chatId={activeChatId} />
         </div>
       </div>
-    <ul class="menu-list menu-expansion-list">
-      {#if sortedChats.length === 0}
-        <li><a href={'#'} class="is-disabled">No chats yet...</a></li>
-      {:else}
-        {#key $checkStateChange}
-        {#each sortedChats as chat, i}       
-        {#key chat.id}
-        <ChatMenuItem activeChatId={activeChatId} chat={chat} prevChat={sortedChats[i - 1]} nextChat={sortedChats[i + 1]} />
-        {/key}
-        {/each}
-        {/key}
+    
       {/if}
-    </ul>
-    <!-- <p class="menu-label">Actions</p> -->
-    <div class="level is-mobile bottom-buttons p-1">
-      <div class="level-left">
-        <div class="dropdown is-left is-up" class:is-active={showSortMenu} use:clickOutside={() => { showSortMenu = false }}>
-          <div class="dropdown-trigger">
-            <button class="button" aria-haspopup="true" aria-controls="dropdown-menu3" on:click|preventDefault|stopPropagation={() => { showSortMenu = !showSortMenu }}>
-              <span class="icon"><Fa icon={sortOption.icon}/></span>
-            </button>
+    </div>
+
+    <!-- Chat list -->
+    <div class="chat-list" class:collapsed={isCollapsed}>
+      {#if !isCollapsed}
+        {#if sortedChats.length === 0}
+          <div class="empty-state">
+            <span>No chats yet...</span>
           </div>
-          <div class="dropdown-menu" id="dropdown-menu3" role="menu">
-            <div class="dropdown-content">
-              {#each Object.values(chatSortOptions) as opt}
-              <a href={'#'} class="dropdown-item" class:is-active={sortOption === opt} on:click|preventDefault={() => { showSortMenu = false; setChatSortOption(opt.value) }}>
-                <span class="menu-icon"><Fa icon={opt.icon}/></span> 
-                {opt.text}
+        {:else}
+          {#key $checkStateChange}
+          {#each sortedChats as chat, i}       
+          {#key chat.id}
+          <ChatMenuItem activeChatId={activeChatId} chat={chat} prevChat={sortedChats[i - 1]} nextChat={sortedChats[i + 1]} />
+          {/key}
+          {/each}
+          {/key}
+        {/if}
+      {/if}
+    </div>
+
+    <!-- Bottom controls -->
+    <div class="sidebar-footer" class:collapsed={isCollapsed}>
+      {#if !isCollapsed}
+        <div class="footer-controls">
+          <div class="new-chat-section">
+            {#if hasModels}
+              <button 
+                class="new-chat-button" 
+                on:click={() => { $pinMainMenu = false; startNewChatWithWarning(activeChatId) }}
+                title="Start new chat">
+                <Fa icon={faSquarePlus} />
+                <span>New Chat</span>
+              </button>
+            {:else}
+              <a href={'#/'} class="new-chat-button api-settings" title="Set up API key">
+                <Fa icon={faKey} />
+                <span>API Settings</span>
               </a>
-              {/each}
+            {/if}
+          </div>
+          <div class="sort-controls">
+            <div class="dropdown is-up" class:is-active={showSortMenu} use:clickOutside={() => { showSortMenu = false }}>
+              <div class="dropdown-trigger">
+                <button class="control-button" on:click|preventDefault|stopPropagation={() => { showSortMenu = !showSortMenu }} title="Sort chats">
+                  <Fa icon={sortOption.icon}/>
+                  <span>Sort</span>
+                </button>
+              </div>
+              <div class="dropdown-menu" role="menu">
+                <div class="dropdown-content">
+                  {#each Object.values(chatSortOptions) as opt}
+                  <a href={'#'} class="dropdown-item" class:is-active={sortOption === opt} on:click|preventDefault={() => { showSortMenu = false; setChatSortOption(opt.value) }}>
+                    <span class="menu-icon"><Fa icon={opt.icon}/></span> 
+                    {opt.text}
+                  </a>
+                  {/each}
+                </div>
+              </div>
             </div>
           </div>
-        </div>  
-        <div class="is-left is-up ml-2">
-            <button class="button" aria-haspopup="true" on:click|preventDefault|stopPropagation={() => { loadLocalStorage() }}>
-              <span class="icon"><Fa icon={faUpload}/></span>
-            </button>
         </div>
-        <div class="is-left is-up ml-2">
-            <button class="button" aria-haspopup="true" on:click|preventDefault|stopPropagation={() => { dumpLocalStorage() }}>
-              <span class="icon"><Fa icon={faDownload}/></span>
-            </button>
-        </div>
-      </div>
-      <div class="level-right">
-        {#if !hasModels}
-        <div class="level-item">
-          <a href={'#/'} class="panel-block" class:is-disabled={!hasModels}
-            ><span class="greyscale mr-1"><Fa icon={faKey} /></span> API Setting</a
-          ></div>
-        {:else}
-        <div class="level-item">
-          <button on:click={() => { $pinMainMenu = false; startNewChatWithWarning(activeChatId) }} class="panel-block button" title="Start new chat with default profile" class:is-disabled={!hasModels}
-            ><span class="greyscale"><Fa icon={faSquarePlus} /></span></button>
+      {:else}
+        <div class="footer-controls-collapsed">
+          <div class="new-chat-section-collapsed">
+            {#if hasModels}
+              <button 
+                class="new-chat-button-collapsed" 
+                on:click={() => { $pinMainMenu = false; startNewChatWithWarning(activeChatId) }}
+                title="Start new chat">
+                <Fa icon={faSquarePlus} />
+              </button>
+            {:else}
+              <a href={'#/'} class="new-chat-button-collapsed api-settings" title="Set up API key">
+                <Fa icon={faKey} />
+              </a>
+            {/if}
           </div>
-        {/if}
-      </div>
+          <div class="dropdown is-up is-right" class:is-active={showSortMenu} use:clickOutside={() => { showSortMenu = false }}>
+            <div class="dropdown-trigger">
+              <button class="control-button-collapsed" on:click|preventDefault|stopPropagation={() => { showSortMenu = !showSortMenu }} title="Sort chats">
+                <Fa icon={sortOption.icon}/>
+              </button>
+            </div>
+            <div class="dropdown-menu" role="menu">
+              <div class="dropdown-content">
+                {#each Object.values(chatSortOptions) as opt}
+                <a href={'#'} class="dropdown-item" class:is-active={sortOption === opt} on:click|preventDefault={() => { showSortMenu = false; setChatSortOption(opt.value) }}>
+                  <span class="menu-icon"><Fa icon={opt.icon}/></span> 
+                  {opt.text}
+                </a>
+                {/each}
+              </div>
+            </div>
+          </div>
+        </div>
+      {/if}
     </div>
   </div>
 </aside>

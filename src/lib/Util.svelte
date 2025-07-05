@@ -6,6 +6,17 @@
   import { replace } from 'svelte-spa-router'
   // import PromptConfirm from './PromptConfirm.svelte'
   import type { ChatSettings } from './Types.svelte'
+  
+  // Generate a short UUID (8 characters) for chat IDs using hex format (0-9a-f)
+  export const generateShortId = (): string => {
+    const chars = '0123456789abcdef'
+    let result = ''
+    for (let i = 0; i < 8; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    return result
+  }
+  
   // Cache for auto-size elements to avoid expensive DOM queries
   let cachedAutoSizeElements: HTMLTextAreaElement[] = []
   let lastElementCount = 0
@@ -137,13 +148,13 @@
     })
   }
 
-  export const startNewChatFromChatId = (chatId: number) => {
+  export const startNewChatFromChatId = (chatId: string) => {
     const newChatId = addChat(getChat(chatId).settings)
     // go to new chat
     replace(`/chat/${newChatId}`)
   }
 
-  export const startNewChatWithWarning = (activeChatId: number|undefined, profile?: ChatSettings|undefined) => {
+  export const startNewChatWithWarning = (activeChatId: string|undefined, profile?: ChatSettings|undefined) => {
     const newChat = () => {
       const chatId = addChat(profile)
       replace(`/chat/${chatId}`)
@@ -164,9 +175,62 @@
     newChat()
   }
 
-  export const valueOf = (chatId: number, value: any) => {
+  export const valueOf = (chatId: string, value: any) => {
     if (typeof value === 'function') return value(chatId)
     return value
+  }
+
+  // Migration function to convert old numeric chat IDs to hex UUIDs
+  export const migrateChatData = () => {
+    try {
+      const chatsDataString = localStorage.getItem('chats')
+      if (!chatsDataString) {
+        console.log('No chat data found to migrate')
+        return false
+      }
+
+      const chatsData = JSON.parse(chatsDataString)
+      if (!Array.isArray(chatsData) || chatsData.length === 0) {
+        console.log('No chats to migrate')
+        return false
+      }
+
+      let migratedCount = 0
+      const migrationMap = new Map() // old ID -> new ID mapping
+
+      // First pass: identify chats with numeric IDs and create new UUIDs
+      chatsData.forEach(chat => {
+        if (typeof chat.id === 'number') {
+          const newId = generateShortId()
+          migrationMap.set(chat.id, newId)
+          chat.id = newId
+          migratedCount++
+        }
+      })
+
+      if (migratedCount === 0) {
+        console.log('No numeric chat IDs found to migrate')
+        return false
+      }
+
+      // Update lastChatId if it was numeric
+      const lastChatIdString = localStorage.getItem('lastChatId')
+      if (lastChatIdString) {
+        const lastChatId = JSON.parse(lastChatIdString)
+        if (typeof lastChatId === 'number' && migrationMap.has(lastChatId)) {
+          localStorage.setItem('lastChatId', JSON.stringify(migrationMap.get(lastChatId)))
+        }
+      }
+
+      // Save migrated data back to localStorage
+      localStorage.setItem('chats', JSON.stringify(chatsData))
+      
+      console.log(`Successfully migrated ${migratedCount} chats from numeric IDs to hex UUIDs`)
+      return true
+    } catch (error) {
+      console.error('Error during chat data migration:', error)
+      return false
+    }
   }
 
   export const escapeRegex = (string: string): string => {

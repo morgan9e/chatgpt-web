@@ -37,7 +37,7 @@
   import { getChatModelOptions, getImageModelOptions } from './Models.svelte'
   import { faClipboard } from '@fortawesome/free-regular-svg-icons'
 
-  export let chatId:number
+  export let chatId:string
   export const show = () => { showSettings() }
   
   let showSettingsModal = 0

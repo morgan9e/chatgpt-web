@@ -16,7 +16,7 @@
   import renderMathInElement from 'https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.mjs'
   
   export let message:Message
-  export let chatId:number
+  export let chatId:string
   export let chat:Chat
 
   $: chatSettings = chat.settings
