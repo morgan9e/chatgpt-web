@@ -196,7 +196,7 @@ export class ChatRequest {
               if (value > maxAllowed || value < 1) value = null // if over max model, do not define max
               if (value) value = Math.floor(value)
               if (modelDetail.reasoning == true) {
-                key = 'max_completion_tokens';
+                key = 'max_completion_tokens'
               }
             }
             if (key === 'n') {
@@ -351,12 +351,21 @@ export class ChatRequest {
            * *************************************************************
            */
     
-          let promptSize = countPromptTokens(top.concat(rw), model, chat) + countPadding
+          // Pre-calculate top tokens once to avoid repeated calculations
+          const topTokens = countPromptTokens(top, model, chat)
+          let rwTokens = countPromptTokens(rw, model, chat)
+          let promptSize = topTokens + rwTokens + countPadding
+          
           while (rw.length && rw.length > pinBottom && promptSize >= threshold) {
             const rolled = rw.shift()
-            // Hide messages we're "rolling"
-            if (rolled) rolled.suppress = true
-            promptSize = countPromptTokens(top.concat(rw), model, chat) + countPadding
+            if (rolled) {
+              // Hide messages we're "rolling"
+              rolled.suppress = true
+              // Subtract only the rolled message tokens instead of recalculating all
+              const rolledTokens = countMessageTokens(rolled, model, chat)
+              rwTokens -= rolledTokens
+              promptSize = topTokens + rwTokens + countPadding
+            }
           }
           // Run a new request, now with the rolled messages hidden
           return await _this.sendRequest(get(currentChatMessages), {
@@ -386,8 +395,11 @@ export class ChatRequest {
           // the last prompt is a user prompt as that seems to work better for summaries
           while (rw.length > 2 && ((topSize + reductionPoolSize + promptSummarySize + maxSummaryTokens) >= maxTokens ||
               (reductionPoolSize >= 100 && rw[rw.length - 1]?.role !== 'user'))) {
-            bottom.unshift(rw.pop() as Message)
-            reductionPoolSize = countPromptTokens(rw, model, chat)
+            const removed = rw.pop() as Message
+            bottom.unshift(removed)
+            // Optimize: subtract removed message tokens instead of recalculating all
+            const removedTokens = countMessageTokens(removed, model, chat)
+            reductionPoolSize -= removedTokens
             maxSummaryTokens = getSS()
             promptSummary = prepareSummaryPrompt(chatId, maxSummaryTokens)
             summaryRequest.content = promptSummary

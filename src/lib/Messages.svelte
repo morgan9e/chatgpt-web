@@ -10,10 +10,15 @@
   
   $: chatSettings = chat.settings
 
+  // Pre-compute filtered messages to avoid complex filtering in template
+  $: filteredMessages = messages.filter((message, i) => {
+    const isHiddenSummarized = (message.summarized) && $globalStorage.hideSummarized
+    const isHiddenSystemPrompt = i === 0 && message.role === 'system' && !chatSettings.useSystemPrompt
+    return !isHiddenSummarized && !isHiddenSystemPrompt
+  })
+
 </script>
 
-{#each messages as message, i}
-  {#if !((message.summarized) && $globalStorage.hideSummarized) && !(i === 0 && message.role === 'system' && !chatSettings.useSystemPrompt)}
+{#each filteredMessages as message}
   {#key message.uuid}<EditMessage bind:message={message} chatId={chatId} chat={chat} />{/key}
-  {/if}
 {/each}

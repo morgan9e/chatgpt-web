@@ -18,7 +18,7 @@
   export const codeBlockStyle: 'indented' | undefined = undefined
   export let text: string
 
-  let renderedMath: string | undefined;
+  let renderedMath: string | undefined
 
   // For copying code - reference: https://vyacheslavbasharov.com/blog/adding-click-to-copy-code-markdown-blog
   const copyFunction = (event) => {

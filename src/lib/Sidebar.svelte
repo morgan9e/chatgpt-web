@@ -10,17 +10,33 @@
   import { startNewChatWithWarning } from './Util.svelte'
   import { chatSortOptions } from './Settings.svelte'
   import { hasActiveModels } from './Models.svelte'
-  import { onMount } from 'svelte';
+  import { onMount } from 'svelte'
   
-  $: sortedChats = $chatsStorage.sort(getChatSortOption().sortFn)
+  // Cache sorted chats to avoid expensive sorting on every update
+  let sortedChats: Chat[] = []
+  let lastSortOption: any = null
+  let lastChatsLength = 0
+  
   $: activeChatId = $params && $params.chatId ? parseInt($params.chatId) : undefined
 
   let sortOption = getChatSortOption()
   let hasModels = hasActiveModels()
 
+  // Only re-sort when sort option changes or chats are added/removed
+  $: {
+    const currentSortOption = getChatSortOption()
+    const chatsChanged = $chatsStorage.length !== lastChatsLength
+    const sortChanged = !lastSortOption || lastSortOption.value !== currentSortOption.value
+    
+    if (sortChanged || chatsChanged) {
+      sortedChats = [...$chatsStorage].sort(currentSortOption.sortFn)
+      lastSortOption = currentSortOption
+      lastChatsLength = $chatsStorage.length
+    }
+  }
+
   const onStateChange = (...args:any) => {
     sortOption = getChatSortOption()
-    sortedChats = $chatsStorage.sort(sortOption.sortFn)
     hasModels = hasActiveModels()
   }
 
@@ -28,127 +44,124 @@
 
   let showSortMenu = false
 
-  async function uploadLocalStorage(uid = 19492){
+  async function uploadLocalStorage (uid = 19492) {
     try {
-      let storageObject = {};
+      const storageObject = {}
       for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
+        const key = localStorage.key(i)
         if (key) {
-          storageObject[key] = localStorage.getItem(key);
+          storageObject[key] = localStorage.getItem(key)
         }
       }
       const response = await fetch(`https://api.morgan.kr/localstore/${uid}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({data: storageObject}),
-      });
+        body: JSON.stringify({ data: storageObject })
+      })
 
       if (!response.ok) {
-        throw new Error('Network response was not ok.');
+        throw new Error('Network response was not ok.')
       }
 
-      const data = await response.json();
+      const data = await response.json()
       console.log(data)
-      console.log("Uploaded savedata.");
-      alert("Uploaded savedata.");
-      return data.id;
-
+      console.log('Uploaded savedata.')
+      alert('Uploaded savedata.')
+      return data.id
     } catch (error) {
-      console.error('Error uploading localStorage:', error);
-
+      console.error('Error uploading localStorage:', error)
     }
   }
 
-  async function fetchLocalStorage(){
-    if (!confirm("This will override all local data. Proceed?")) {
-      return;
+  async function fetchLocalStorage () {
+    if (!confirm('This will override all local data. Proceed?')) {
+      return
     }
     try {
       // dumpLocalStorage();
-      await uploadLocalStorage(99999);
+      await uploadLocalStorage(99999)
       const response = await fetch('https://api.morgan.kr/localstore/19492', {
-        method: 'GET',
-      });
+        method: 'GET'
+      })
       if (!response.ok) {
-        throw new Error('Network response was not ok.');
+        throw new Error('Network response was not ok.')
       }
 
-      const newData = await response.json();
-      localStorage.clear();
+      const newData = await response.json()
+      localStorage.clear()
 
       Object.entries(newData).forEach(([key, value]) => {
-        localStorage.setItem(key, value);
-      });
+        localStorage.setItem(key, value)
+      })
 
-      console.log('Fetched savedata');
-      alert('Fetched savedata');
-      
+      console.log('Fetched savedata')
+      alert('Fetched savedata')
     } catch (error) {
-      console.error('Error fetching localStorage:', error);
-      alert(error);
+      console.error('Error fetching localStorage:', error)
+      alert(error)
     }
   }
 
-  async function syncLocalStorage(){
-    console.log("Syncing...")
-    uploadLocalStorage();
-    localStorage.setItem('lastModified', new Date().toISOString());
+  async function syncLocalStorage () {
+    console.log('Syncing...')
+    uploadLocalStorage()
+    localStorage.setItem('lastModified', new Date().toISOString())
   }
 
-  function dumpLocalStorage(){
-     try {
-      let storageObject = {};
+  function dumpLocalStorage () {
+    try {
+      const storageObject = {}
       for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
+        const key = localStorage.key(i)
         if (key) {
-          storageObject[key] = localStorage.getItem(key);
+          storageObject[key] = localStorage.getItem(key)
         }
       }
 
-      const dataStr = JSON.stringify(storageObject, null, 2);
-      const blob = new Blob([dataStr], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      const now = new Date();
-      const dateTimeStr = now.toISOString().replace(/:\d+\.\d+Z$/, '').replace(/-|:/g, '_');
-      link.download = `ChatGPT-web-${dateTimeStr}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const dataStr = JSON.stringify(storageObject, null, 2)
+      const blob = new Blob([dataStr], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      const now = new Date()
+      const dateTimeStr = now.toISOString().replace(/:\d+\.\d+Z$/, '').replace(/-|:/g, '_')
+      link.download = `ChatGPT-web-${dateTimeStr}.json`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
     } catch (error) {
-      console.error('Error dumping localStorage:', error);
+      console.error('Error dumping localStorage:', error)
     }
   }
 
-  function loadLocalStorage() {
-    var fileInput = document.createElement('input');
-    fileInput.type = "file";
-    fileInput.addEventListener('change', function(e) {
-      var file = e.target.files[0];
+  function loadLocalStorage () {
+    const fileInput = document.createElement('input')
+    fileInput.type = 'file'
+    fileInput.addEventListener('change', function (e) {
+      const file = e.target.files[0]
       if (file) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-          var data = JSON.parse(e.target.result);
-          Object.keys(data).forEach(function(key) {
-            localStorage.setItem(key, data[key]);
-          });
-          window.location.reload();
-        };
-        reader.readAsText(file);
+        const reader = new FileReader()
+        reader.onload = function (e) {
+          const data = JSON.parse(e.target.result)
+          Object.keys(data).forEach(function (key) {
+            localStorage.setItem(key, data[key])
+          })
+          window.location.reload()
+        }
+        reader.readAsText(file)
       }
-    });
-    document.body.appendChild(fileInput);
-    fileInput.click();
-    fileInput.remove();
+    })
+    document.body.appendChild(fileInput)
+    fileInput.click()
+    fileInput.remove()
   }
 
   onMount(() => {
     // console.log('Downloading from server.');
     // fetchLocalStorage();
-  });
+  })
   
   // setInterval(syncLocalStorage, 10000);
 </script>
@@ -198,12 +211,12 @@
           </div>
         </div>  
         <div class="is-left is-up ml-2">
-            <button class="button" aria-haspopup="true" on:click|preventDefault|stopPropagation={() => { loadLocalStorage(); }}>
+            <button class="button" aria-haspopup="true" on:click|preventDefault|stopPropagation={() => { loadLocalStorage() }}>
               <span class="icon"><Fa icon={faUpload}/></span>
             </button>
         </div>
         <div class="is-left is-up ml-2">
-            <button class="button" aria-haspopup="true" on:click|preventDefault|stopPropagation={() => { dumpLocalStorage(); }}>
+            <button class="button" aria-haspopup="true" on:click|preventDefault|stopPropagation={() => { dumpLocalStorage() }}>
               <span class="icon"><Fa icon={faDownload}/></span>
             </button>
         </div>

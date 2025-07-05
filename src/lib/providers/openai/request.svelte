@@ -33,8 +33,8 @@ export const chatRequest = async (
       }
 
       if (modelDetail.stream === false) {
-        opts.streaming = false;
-        console.log("Disabled streaming on reasoning models.");
+        opts.streaming = false
+        console.log('Disabled streaming on reasoning models.')
       }
 
       if (opts.streaming && !modelDetail.stream) {

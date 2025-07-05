@@ -1,7 +1,7 @@
 <script lang="ts">
   import Code from './Code.svelte'
   import Codespan from './Codespan.svelte'
-  import { afterUpdate, createEventDispatcher, onMount } from 'svelte'
+  import { afterUpdate, createEventDispatcher, onMount, onDestroy } from 'svelte'
   import { deleteMessage, deleteSummaryMessage, truncateFromMessage, submitExitingPromptsNow, continueMessage, updateMessages } from './Storage.svelte'
   import { getPrice } from './Stats.svelte'
   import SvelteMarkdown from 'svelte-markdown'
@@ -13,8 +13,8 @@
   import PromptConfirm from './PromptConfirm.svelte'
   import { getImage } from './ImageStore.svelte'
   import { getModelDetail } from './Models.svelte'
-  import renderMathInElement from "https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.mjs";
-    
+  import renderMathInElement from 'https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.mjs'
+  
   export let message:Message
   export let chatId:number
   export let chat:Chat
@@ -177,21 +177,37 @@
   }
 
   const takeReason = (msg) => {
-    if(isAssistant) {
-      const regex = /<think>([\s\S]*?)<\/think>/;
-      const match = msg.match(regex);
-      
+    if (isAssistant) {
+      const regex = /<think>([\s\S]*?)<\/think>/
+      const match = msg.match(regex)
+  
       if (match) {
-        message.reason = match[1];
-        msg = msg.replace(regex, '');
+        message.reason = match[1]
+        msg = msg.replace(regex, '')
       }
     } else {
-      message.reason = "";
+      message.reason = ''
     }
-    return msg;
-  };
+    return msg
+  }
 
   let waitingForTruncateConfirm:any = 0
+
+  // Clean up timers to prevent memory leaks
+  onDestroy(() => {
+    if (dbnc) {
+      clearTimeout(dbnc)
+      dbnc = null
+    }
+    if (waitingForDeleteConfirm) {
+      clearTimeout(waitingForDeleteConfirm)
+      waitingForDeleteConfirm = null
+    }
+    if (waitingForTruncateConfirm) {
+      clearTimeout(waitingForTruncateConfirm)
+      waitingForTruncateConfirm = null
+    }
+  })
 
   const checkTruncate = () => {
     clearTimeout(waitingForDeleteConfirm); waitingForDeleteConfirm = 0
@@ -237,86 +253,86 @@
   }
 
 const replaceLatexDelimiters = (text: string): string => {
-  let result = '';
-  let i = 0;
+    let result = ''
+    let i = 0
 
-  while (i < text.length) {
+    while (i < text.length) {
     // Check for display math: $$ ... $$
-    if (text.startsWith('$$aaaaaaaa', i)) {
-      const endPos = text.indexOf('$$', i + 2);
-      if (endPos === -1) {
-        console.error(`LaTeX: Delimiter mismatch (missing $$) at position ${i}`);
-        result += text[i];
-        i++;
-      } else {
+      if (text.startsWith('$$aaaaaaaa', i)) {
+        const endPos = text.indexOf('$$', i + 2)
+        if (endPos === -1) {
+          console.error(`LaTeX: Delimiter mismatch (missing $$) at position ${i}`)
+          result += text[i]
+          i++
+        } else {
         // Wrap in backticks for KaTeX
-        result += `\`\\[${text.slice(i + 2, endPos)}\\]\``;
-        i = endPos + 2;
+          result += `\`\\[${text.slice(i + 2, endPos)}\\]\``
+          i = endPos + 2
+        }
+      }
+      // Check for inline math: $ ... $
+      else if (text.startsWith('$aaaaaaaaa', i)) {
+        const endPos = text.indexOf('$', i + 1)
+        if (endPos === -1) {
+          console.error(`LaTeX: Delimiter mismatch (missing $) at position ${i}`)
+          result += text[i]
+          i++
+        } else {
+          result += `\`$${text.slice(i + 1, endPos)}$\``
+          i = endPos + 1
+        }
+      }
+      // Check for inline math: \(...\)
+      else if (text.startsWith('\\(', i)) {
+        const endPos = text.indexOf('\\)', i + 2)
+        if (endPos === -1) {
+          console.error(`LaTeX: Delimiter mismatch (missing \\)) at position ${i}`)
+          result += text[i]
+          i++
+        } else {
+          result += '`\\(' + text.slice(i + 2, endPos) + '\\)`'
+          i = endPos + 2
+        }
+      }
+      // Check for display math: \[...\]
+      else if (text.startsWith('\\[', i)) {
+        const endPos = text.indexOf('\\]', i + 2)
+        if (endPos === -1) {
+          console.error(`LaTeX: Delimiter mismatch (missing \\]) at position ${i}`)
+          result += text[i]
+          i++
+        } else {
+          result += `\`\\[${text.slice(i + 2, endPos)}\\]\``
+          i = endPos + 2
+        }
+      }
+      // Otherwise, just copy the current character (also handling backslash escapes)
+      else {
+        if (text.startsWith('\\(', i)) {
+          result += '\\('
+          i += 2
+        } else if (text.startsWith('\\)', i)) {
+          result += '\\)'
+          i += 2
+        } else if (text.startsWith('\\[', i)) {
+          result += '\\['
+          i += 2
+        } else if (text.startsWith('\\]', i)) {
+          result += '\\]'
+          i += 2
+        } else {
+          result += text[i]
+          i++
+        }
       }
     }
-    // Check for inline math: $ ... $
-    else if (text.startsWith('$aaaaaaaaa', i)) {
-      const endPos = text.indexOf('$', i + 1);
-      if (endPos === -1) {
-        console.error(`LaTeX: Delimiter mismatch (missing $) at position ${i}`);
-        result += text[i];
-        i++;
-      } else {
-        result += `\`$${text.slice(i + 1, endPos)}$\``;
-        i = endPos + 1;
-      }
-    }
-    // Check for inline math: \(...\)
-    else if (text.startsWith('\\(', i)) {
-      const endPos = text.indexOf('\\)', i + 2);
-      if (endPos === -1) {
-        console.error(`LaTeX: Delimiter mismatch (missing \\)) at position ${i}`);
-        result += text[i];
-        i++;
-      } else {
-        result += '`\\(' + text.slice(i + 2, endPos) + '\\)`';
-        i = endPos + 2;
-      }
-    }
-    // Check for display math: \[...\]
-    else if (text.startsWith('\\[', i)) {
-      const endPos = text.indexOf('\\]', i + 2);
-      if (endPos === -1) {
-        console.error(`LaTeX: Delimiter mismatch (missing \\]) at position ${i}`);
-        result += text[i];
-        i++;
-      } else {
-        result += `\`\\[${text.slice(i + 2, endPos)}\\]\``;
-        i = endPos + 2;
-      }
-    }
-    // Otherwise, just copy the current character (also handling backslash escapes)
-    else {
-      if (text.startsWith('\\(', i)) {
-        result += '\\(';
-        i += 2;
-      } else if (text.startsWith('\\)', i)) {
-        result += '\\)';
-        i += 2;
-      } else if (text.startsWith('\\[', i)) {
-        result += '\\[';
-        i += 2;
-      } else if (text.startsWith('\\]', i)) {
-        result += '\\]';
-        i += 2;
-      } else {
-        result += text[i];
-        i++;
-      }
-    }
-  }
-  return result;
-};
+    return result
+}
 
 
   const renderMathMsg = () => {
-    displayMessage = replaceLatexDelimiters(message.content);
-  };
+    displayMessage = replaceLatexDelimiters(message.content)
+  }
 
 </script>
 
@@ -349,7 +365,7 @@ const replaceLatexDelimiters = (text: string): string => {
       <div 
         class="message-display" 
           on:touchend={editOnDoubleTap}
-          on:dblclick|preventDefault={() => {if(isUser){edit()}}}
+          on:dblclick|preventDefault={() => { if (isUser) { edit() } }}
         >
         {#if message.summary && !message.summary.length}
         <p><b>Summarizing...</b></p>

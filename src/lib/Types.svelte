@@ -160,8 +160,6 @@ export type GlobalSettings = {
     hideSummarized: boolean;
     chatSort: ChatSortOptions;
     openAICompletionEndpoint: string;
-    enablePetals: boolean;
-    pedalsEndpoint: string;
   };
 
   type SettingNumber = {

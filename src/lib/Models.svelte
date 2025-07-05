@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-  import { apiKeyStorage, globalStorage } from './Storage.svelte'
+  import { apiKeyStorage } from './Storage.svelte'
   import { get } from 'svelte/store'
   import type { ModelDetail, Model, SelectOption, Chat } from './Types.svelte'
   import { mergeProfileFields } from './Profiles.svelte'
@@ -13,7 +13,7 @@ const unknownDetail = {
 } as ModelDetail
 
 export const supportedChatModels : Record<string, ModelDetail> = {
-    ...openAiModels,
+    ...openAiModels
     // ...petalsModels
 }
 
@@ -144,8 +144,7 @@ export const countTokens = (model: Model, value: string): number => {
 }
 
 export const hasActiveModels = (): boolean => {
-    const globalSettings = get(globalStorage) || {}
-    return !!get(apiKeyStorage) || !!globalSettings.enablePetals
+    return !!get(apiKeyStorage)
 }
 
 export async function getChatModelOptions (): Promise<SelectOption[]> {
@@ -155,12 +154,12 @@ export async function getChatModelOptions (): Promise<SelectOption[]> {
       const model = models[i]
       const modelDetail = getModelDetail(model)
       await modelDetail.check(modelDetail)
-      if(modelDetail.enabled){
-          result.push({
-            value: model,
-            text: modelDetail.label || model,
-            disabled: !modelDetail.enabled
-          })
+      if (modelDetail.enabled) {
+        result.push({
+          value: model,
+          text: modelDetail.label || model,
+          disabled: !modelDetail.enabled
+        })
       }
     }
     return result

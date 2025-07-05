@@ -157,74 +157,72 @@
     reader.readAsText(image)
   }
 
-  function dumpLocalStorage(){
-     try {
-      let storageObject = {};
+  function dumpLocalStorage () {
+    try {
+      const storageObject = {}
       for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
+        const key = localStorage.key(i)
         if (key) {
-          storageObject[key] = localStorage.getItem(key);
+          storageObject[key] = localStorage.getItem(key)
         }
       }
 
-      const dataStr = JSON.stringify(storageObject, null, 2);
-      const blob = new Blob([dataStr], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      const now = new Date();
-      const dateTimeStr = now.toISOString().replace(/:\d+\.\d+Z$/, '').replace(/-|:/g, '_');
-      link.download = `ChatGPT-web-${dateTimeStr}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    
+      const dataStr = JSON.stringify(storageObject, null, 2)
+      const blob = new Blob([dataStr], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      const now = new Date()
+      const dateTimeStr = now.toISOString().replace(/:\d+\.\d+Z$/, '').replace(/-|:/g, '_')
+      link.download = `ChatGPT-web-${dateTimeStr}.json`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
     } catch (error) {
-      console.error('Error dumping localStorage:', error);
+      console.error('Error dumping localStorage:', error)
     }
   }
   
-  function loadLocalStorage() {
-    var fileInput = document.createElement('input');
-    fileInput.type = "file";
-    fileInput.addEventListener('change', function(e) {
-      var file = e.target.files[0];
+  function loadLocalStorage () {
+    const fileInput = document.createElement('input')
+    fileInput.type = 'file'
+    fileInput.addEventListener('change', function (e) {
+      const file = e.target.files[0]
       if (file) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-          var data = JSON.parse(e.target.result);
-          Object.keys(data).forEach(function(key) {
-            localStorage.setItem(key, data[key]);
-          });
-          window.location.reload();
-        };
-        reader.readAsText(file);
+        const reader = new FileReader()
+        reader.onload = function (e) {
+          const data = JSON.parse(e.target.result)
+          Object.keys(data).forEach(function (key) {
+            localStorage.setItem(key, data[key])
+          })
+          window.location.reload()
+        }
+        reader.readAsText(file)
       }
-    });
-    document.body.appendChild(fileInput);
-    fileInput.click();
-    fileInput.remove();
+    })
+    document.body.appendChild(fileInput)
+    fileInput.click()
+    fileInput.remove()
   }
 
-  function backupLocalStorage() {
-     try {
-      let storageObject = {};
+  function backupLocalStorage () {
+    try {
+      const storageObject = {}
       for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
+        const key = localStorage.key(i)
         if (key) {
-          storageObject[key] = localStorage.getItem(key);
+          storageObject[key] = localStorage.getItem(key)
         }
       }
-      const dataStr = JSON.stringify(storageObject, null, 2);
-      const now = new Date();
-      const dateTimeStr = now.toISOString().replace(/:\d+\.\d+Z$/, '').replace(/-|:/g, '_');
-      localStorage.setItem(`prev-${dateTimeStr}`, dataStr);
+      const dataStr = JSON.stringify(storageObject, null, 2)
+      const now = new Date()
+      const dateTimeStr = now.toISOString().replace(/:\d+\.\d+Z$/, '').replace(/-|:/g, '_')
+      localStorage.setItem(`prev-${dateTimeStr}`, dataStr)
     } catch (error) {
-      console.error('Error backing up localStorage:', error);
+      console.error('Error backing up localStorage:', error)
     }
-
-  }
+}
 
 </script>
 

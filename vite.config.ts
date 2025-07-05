@@ -6,13 +6,13 @@ import purgecss from '@fullhuman/postcss-purgecss'
 // import { visualizer } from 'rollup-plugin-visualizer';
 
 const plugins = [
-    svelte(),
-    dsv(),
-    // visualizer({
-    //   open: true,
-    //   gzipSize: true,
-    //   brotliSize: true,
-    // }),
+  svelte(),
+  dsv()
+  // visualizer({
+  //   open: true,
+  //   gzipSize: true,
+  //   brotliSize: true,
+  // }),
 ]
 
 // https://vitejs.dev/config/

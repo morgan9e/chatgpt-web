@@ -2,18 +2,16 @@
   import { persisted } from 'svelte-local-storage-store'
   import { get } from 'svelte/store'
   // This makes it possible to override the OpenAI API base URL in the .env file
-  const apiBaseStorage = persisted('apiBase', 'https://api.openai.com');
+  const apiBaseStorage = persisted('apiBase', 'https://api.openai.com')
 
-  const apiBase = get(apiBaseStorage) || 'https://api.openai.com';
+  const apiBase = get(apiBaseStorage) || 'https://api.openai.com'
   const endpointCompletions = import.meta.env.VITE_ENDPOINT_COMPLETIONS || '/v1/chat/completions'
   const endpointGenerations = import.meta.env.VITE_ENDPOINT_GENERATIONS || '/v1/images/generations'
   const endpointModels = import.meta.env.VITE_ENDPOINT_MODELS || '/v1/models'
   const endpointEmbeddings = import.meta.env.VITE_ENDPOINT_EMBEDDINGS || '/v1/embeddings'
-  const petalsBase = import.meta.env.VITE_PEDALS_WEBSOCKET || 'wss://chat.petals.dev'
-  const endpointPetals = import.meta.env.VITE_PEDALS_WEBSOCKET || '/api/v2/generate'
 
-  export const setApiBase = (e: Record<string>) => {
-    console.log(e);
+  export const setApiBase = (e: string) => {
+    console.log(e)
     apiBaseStorage.set(e || '')
   }
   export const getApiBase = ():string => apiBase
@@ -21,6 +19,4 @@
   export const getEndpointGenerations = ():string => endpointGenerations
   export const getEndpointModels = ():string => endpointModels
   export const getEndpointEmbeddings = ():string => endpointEmbeddings
-  export const getPetalsBase = ():string => petalsBase
-  export const getPetalsWebsocket = ():string => endpointPetals
 </script>

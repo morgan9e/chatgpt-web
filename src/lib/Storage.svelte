@@ -246,29 +246,43 @@
     }, 10)
   }
 
-  const signalChangeTimers: any = {}
+  const signalChangeTimers = new Map<number, any>()
   const setChatLastUse = (chatId: number, time: number) => {
-    clearTimeout(signalChangeTimers[chatId])
-    signalChangeTimers[chatId] = setTimeout(() => {
+    const existingTimer = signalChangeTimers.get(chatId)
+    if (existingTimer) {
+      clearTimeout(existingTimer)
+    }
+    const timer = setTimeout(() => {
       getChat(chatId).lastUse = time
       saveChatStore()
+      signalChangeTimers.delete(chatId)
     }, 500)
+    signalChangeTimers.set(chatId, timer)
   }
 
-  const setMessagesTimers: any = {}
+  const setMessagesTimers = new Map<number, any>()
   export const setMessages = (chatId: number, messages: Message[]) => {
     if (get(currentChatId) === chatId) {
       // update current message cache right away
       currentChatMessages.set(messages)
-      clearTimeout(setMessagesTimers[chatId])
+      const existingTimer = setMessagesTimers.get(chatId)
+      if (existingTimer) {
+        clearTimeout(existingTimer)
+      }
       // delay expensive all chats update for a bit
-      setMessagesTimers[chatId] = setTimeout(() => {
+      const timer = setTimeout(() => {
         getChat(chatId).messages = messages
         saveChatStore()
         setChatLastUse(chatId, Date.now())
+        setMessagesTimers.delete(chatId)
       }, 200)
+      setMessagesTimers.set(chatId, timer)
     } else {
-      clearTimeout(setMessagesTimers[chatId])
+      const existingTimer = setMessagesTimers.get(chatId)
+      if (existingTimer) {
+        clearTimeout(existingTimer)
+        setMessagesTimers.delete(chatId)
+      }
       getChat(chatId).messages = messages
       saveChatStore()
       setChatLastUse(chatId, Date.now())
@@ -277,6 +291,24 @@
 
   export const updateMessages = (chatId: number) => {
     setMessages(chatId, getMessages(chatId))
+  }
+
+  // Cleanup function to clear all timers and prevent memory leaks
+  export const clearAllTimers = () => {
+    if (setChatTimer) {
+      clearTimeout(setChatTimer)
+      setChatTimer = null
+    }
+    
+    signalChangeTimers.forEach((timer) => {
+      clearTimeout(timer)
+    })
+    signalChangeTimers.clear()
+    
+    setMessagesTimers.forEach((timer) => {
+      clearTimeout(timer)
+    })
+    setMessagesTimers.clear()
   }
 
   export const addError = (chatId: number, error: string) => {

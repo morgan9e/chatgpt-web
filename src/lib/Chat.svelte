@@ -51,15 +51,25 @@
   let recording = false
   let lastSubmitRecorded = false
 
-  $: chat = $chatsStorage.find((chat) => chat.id === chatId) as Chat
-  $: chatSettings = chat?.settings
+  // Optimize chat lookup to avoid expensive find() on every chats update
+  let chat: Chat
+  let chatSettings: ChatSettings
   let showSettingsModal
 
-  let scDelay
+  // Only update chat when chatId changes or when the specific chat is updated
+  $: {
+    const foundChat = $chatsStorage.find((c) => c.id === chatId)
+    if (foundChat && (!chat || chat.id !== foundChat.id || chat !== foundChat)) {
+      chat = foundChat
+      chatSettings = foundChat.settings
+    }
+  }
+
+  let scDelay: any
   const onStateChange = (...args:any) => {
     if (!chat) return
-    clearTimeout(scDelay)
-    setTimeout(() => {
+    if (scDelay) clearTimeout(scDelay)
+    scDelay = setTimeout(() => {
       if (chat.startSession) {
         restartProfile(chatId)
         if (chat.startSession) {
@@ -101,6 +111,11 @@
 
   onDestroy(async () => {
     // clean up
+    // Clear timer to prevent memory leaks
+    if (scDelay) {
+      clearTimeout(scDelay)
+      scDelay = null
+    }
     // abort any pending requests.
     chatRequest.controller.abort()
     ttsStop()
@@ -286,12 +301,12 @@
     chatRequest.updatingMessage = ''
 
 
-    const userMessagesCount = chat.messages.filter(message => message.role === "user").length;
-    const assiMessagesCount = chat.messages.filter(message => message.role === "assistant").length;
-    if (userMessagesCount == 3 && chat.name.startsWith("Chat ")) {
-      suggestName();
+    const userMessagesCount = chat.messages.filter(message => message.role === 'user').length
+    const assiMessagesCount = chat.messages.filter(message => message.role === 'assistant').length
+    if (userMessagesCount == 3 && chat.name.startsWith('Chat ')) {
+      suggestName()
     }
-    
+  
     focusInput()
   }
 
@@ -305,7 +320,7 @@
     const suggestMessages = $currentChatMessages.slice(0, 4)
     suggestMessages.push(suggestMessage)
 
-    const currentModel = chat.settings.model;
+    const currentModel = chat.settings.model
     // chat.settings.model = "gpt-4o";
 
     chatRequest.updating = true
@@ -318,7 +333,7 @@
       maxTokens: 30
     })
 
-    chat.settings.model = currentModel;
+    chat.settings.model = currentModel
 
     try {
       await response.promiseToFinish()

@@ -6,10 +6,25 @@
   import { replace } from 'svelte-spa-router'
   // import PromptConfirm from './PromptConfirm.svelte'
   import type { ChatSettings } from './Types.svelte'
+  // Cache for auto-size elements to avoid expensive DOM queries
+  let cachedAutoSizeElements: HTMLTextAreaElement[] = []
+  let lastElementCount = 0
+
   export const sizeTextElements = (force?: boolean) => {
-    const els = document.querySelectorAll('textarea.auto-size')
-    for (let i:number = 0, l = els.length; i < l; i++) {
-      autoGrowInput(els[i] as HTMLTextAreaElement, force)
+    // Only re-query if force is true or element count changed
+    const currentElements = document.querySelectorAll('textarea.auto-size')
+    if (force || currentElements.length !== lastElementCount) {
+      cachedAutoSizeElements = Array.from(currentElements) as HTMLTextAreaElement[]
+      lastElementCount = currentElements.length
+    }
+    
+    // Use cached elements for better performance
+    for (let i = 0, l = cachedAutoSizeElements.length; i < l; i++) {
+      const el = cachedAutoSizeElements[i]
+      // Check if element is still in DOM
+      if (document.contains(el)) {
+        autoGrowInput(el, force)
+      }
     }
   }
 

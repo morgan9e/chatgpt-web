@@ -1,7 +1,6 @@
 <script context="module" lang="ts">
     import { applyProfile } from './Profiles.svelte'
-    import { get } from 'svelte/store'
-    import { apiKeyStorage, getChatSettings, getGlobalSettings, setGlobalSettingValueByKey } from './Storage.svelte'
+    import { getChatSettings, getGlobalSettings, setGlobalSettingValueByKey } from './Storage.svelte'
     import { faArrowDown91, faArrowDownAZ, faCheck, faThumbTack } from '@fortawesome/free-solid-svg-icons/index'
 // Setting definitions
 
@@ -21,10 +20,8 @@ import {
     import { getModelDetail, getTokens } from './Models.svelte'
 
 const defaultModel:Model = 'gpt-4'
-const defaultModelPetals:Model = 'stabilityai/StableBeluga2'
 
 export const getDefaultModel = (): Model => {
-  if (!get(apiKeyStorage)) return defaultModelPetals
   return defaultModel
 }
 
@@ -66,7 +63,7 @@ export const getExcludeFromProfile = () => {
   return excludeFromProfile
 }
 
-const hideModelSetting = (chatId, setting) => {
+const hideModelSetting = (chatId: number, setting: ChatSetting) => {
   return getModelDetail(getChatSettings(chatId).model).hideSetting(chatId, setting)
 }
 
@@ -134,9 +131,7 @@ export const globalDefaults: GlobalSettings = {
   defaultProfile: 'default',
   hideSummarized: false,
   chatSort: 'created',
-  openAICompletionEndpoint: '',
-  enablePetals: false,
-  pedalsEndpoint: ''
+  openAICompletionEndpoint: ''
 }
 
 const excludeFromProfile = {
@@ -710,16 +705,6 @@ const globalSettingsList:GlobalSetting[] = [
       {
         key: 'openAICompletionEndpoint',
         name: 'OpenAI Completions Endpoint',
-        type: 'text'
-      },
-      {
-        key: 'enablePetals',
-        name: 'Enable Petals APIs',
-        type: 'boolean'
-      },
-      {
-        key: 'pedalsEndpoint',
-        name: 'Petals API Endpoint',
         type: 'text'
       }
 ]
