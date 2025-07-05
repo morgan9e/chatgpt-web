@@ -315,6 +315,10 @@ select option.is-default {
   text-decoration: none !important;
 }
 
+.chat-header .subtitle svg {
+  font-size: 12px;
+}
+
 .content {
   font-size: 15px;
   line-height: 30px;
@@ -742,10 +746,11 @@ aside.menu.main-menu .menu-expanse {
 }
 
 .content.running-total-container {
-  min-height:1em;
-  // padding-bottom:.6em;
-  // /* padding-left: 1.9em; */
-  margin-bottom: .5em;
+  min-height: 1em;
+  margin-bottom: 0;
+  font-size: 8px !important;
+  line-height: 1;
+  color: transparent;
 }
 
 .content.credit-footer {
@@ -967,6 +972,7 @@ aside.menu.main-menu .menu-expanse {
 .modern-sidebar {
   transition: width 0.3s ease;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
   
   &.collapsed {
     width: var(--sidebarCollapsedWidth) !important;
@@ -1010,7 +1016,7 @@ aside.menu.main-menu .menu-expanse {
     font-size: 14px;
 
     img {
-      margin-right: 8px;
+    
       width: 20px;
       height: 20px;
     }

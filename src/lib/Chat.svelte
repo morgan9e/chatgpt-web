@@ -29,6 +29,8 @@
     faPenToSquare,
     faMicrophone,
     faLightbulb,
+    faClone,
+    faTrash,
     faCommentSlash,
     faCircleCheck
   } from '@fortawesome/free-solid-svg-icons/index'
@@ -202,7 +204,7 @@
 
     // Clear the input value
     input.value = ''
-    // input.blur()
+    input.style.height = 'auto'
     focusInput()
   }
 
@@ -395,8 +397,6 @@
         <span>{chat.name || `New Chat`}</span>
         <a href={'#'} class="greyscale ml-2 is-hidden has-text-weight-bold editbutton" title="Rename chat" on:click|preventDefault={promptRename}><Fa icon={faPenToSquare} /></a>
         <a href={'#'} class="greyscale ml-2 is-hidden has-text-weight-bold editbutton" title="Suggest a chat name" on:click|preventDefault={suggestName}><Fa icon={faLightbulb} /></a>
-        <!-- <a href={'#'} class="greyscale ml-2 is-hidden has-text-weight-bold editbutton" title="Copy this chat" on:click|preventDefault={() => { copyChat(chatId) }}><Fa icon={faClone} /></a> -->
-        <!-- <a href={'#'} class="greyscale ml-2 is-hidden has-text-weight-bold editbutton" title="Delete this chat" on:click|preventDefault={deleteChat}><Fa icon={faTrash} /></a> -->
       </p>
     </div>
   </div>
@@ -450,9 +450,6 @@
     <p class="control settings">
       <button title="Chat/Profile Settings" class="button" on:click|preventDefault={showSettingsModal}><span class="icon"><Fa icon={faGear} /></span></button>
     </p>
-    <p class="control">
-      <button class="button is-ghost" on:click|preventDefault={suggestName}><span class="icon"><Fa icon={faLightbulb} /></span></button>
-    </p>
     <p class="control queue">
       <button title="Queue message, don't send yet" class:is-disabled={chatRequest.updating} class="button is-ghost" on:click|preventDefault={addNewMessage}><span class="icon"><Fa icon={faArrowUpFromBracket} /></span></button>
     </p>
@@ -475,7 +472,7 @@
   <!-- a target to scroll to -->
   <div class="content has-text-centered running-total-container">
     {#each Object.entries(chat.usage || {}) as [model, usage]}
-    <p class="is-size-7 running-totals">
+    <p class="running-totals">
       <em>{getModelDetail(model || '').label || model}</em> total <span class="has-text-weight-bold">{usage.total_tokens}</span>
       tokens ~= <span class="has-text-weight-bold">${getPrice(usage, model).toFixed(6)}</span>
     </p>
