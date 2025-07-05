@@ -4,7 +4,7 @@
   import { replace } from 'svelte-spa-router'
   import { afterUpdate, onMount } from 'svelte'
   import { getApiBase, setApiBase } from './ApiUtil.svelte'
-  import { set as setOpenAI } from './providers/openai/util.svelte'
+  import { set as setOpenAI } from './api/util.svelte'
   import { hasActiveModels } from './Models.svelte'
 
 $: apiKey = $apiKeyStorage

@@ -10,7 +10,7 @@
   import { chatsStorage } from './lib/Storage.svelte'
   import { Modals, closeModal } from 'svelte-modals'
   import { dispatchModalEsc, checkModalEsc, migrateChatData } from './lib/Util.svelte'
-  import { set as setOpenAI } from './lib/providers/openai/util.svelte'
+  import { set as setOpenAI } from './lib/api/util.svelte'
   import { hasActiveModels } from './lib/Models.svelte'
 
   // Run migration on app startup to convert old numeric chat IDs to UUIDs

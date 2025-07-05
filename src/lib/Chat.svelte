@@ -17,7 +17,6 @@
     type Message,
     type Chat
   } from './Types.svelte'
-  import Prompts from './Prompts.svelte'
   import Messages from './Messages.svelte'
   import { restartProfile } from './Profiles.svelte'
   import { afterUpdate, onMount, onDestroy } from 'svelte'
@@ -419,9 +418,6 @@
   </article>
 {/if}
 
-{#if $currentChatId && ($currentChatMessages.length === 0 || ($currentChatMessages.length === 1 && $currentChatMessages[0].role === 'system'))}
-  <Prompts bind:input />
-{/if}
 </div>
 <Footer class="prompt-input-container" strongMask={true}>
   <form class="field has-addons has-addons-right is-align-items-flex-end" on:submit|preventDefault={() => submitForm()}>

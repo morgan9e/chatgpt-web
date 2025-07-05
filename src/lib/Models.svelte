@@ -5,9 +5,8 @@
   import { mergeProfileFields } from './Profiles.svelte'
   import { getChatSettingObjectByKey } from './Settings.svelte'
   import { valueOf } from './Util.svelte'
-  import { chatModels as openAiModels, imageModels as openAiImageModels } from './providers/openai/models.svelte'
-  // import { chatModels as petalsModels } from './providers/petals/models.svelte'
-
+  import { chatModels as openAiModels, imageModels as openAiImageModels } from './api/models.svelte'
+  
 const unknownDetail = {
     ...Object.values(openAiModels)[0]
 } as ModelDetail
