@@ -19,6 +19,7 @@
   } from '@fortawesome/free-solid-svg-icons/index'
   import { faSquareMinus, faSquarePlus as faSquarePlusOutline } from '@fortawesome/free-regular-svg-icons/index'
   import { addChatFromJSON, chatsStorage, checkStateChange, clearChats, clearMessages, copyChat, globalStorage, setGlobalSettingValueByKey, showSetChatSettings, pinMainMenu, getChat, deleteChat, saveChatStore, saveCustomProfile } from './Storage.svelte'
+  import { getChatSortOption } from './Storage.svelte'
   import { exportAsMarkdown, exportChatAsJSON } from './Export.svelte'
   import { newNameForProfile, restartProfile } from './Profiles.svelte'
   import { replace } from 'svelte-spa-router'
@@ -36,7 +37,12 @@
   }
   export let style: string = 'is-right'
 
-  $: sortedChats = $chatsStorage.sort((a, b) => b.id - a.id)
+  let sortedChats = []
+  
+  $: {
+    const currentSortOption = getChatSortOption()
+    sortedChats = [...$chatsStorage].sort(currentSortOption.sortFn)
+  }
 
   let showChatMenu = false
   let chatFileInput
