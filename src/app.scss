@@ -248,8 +248,11 @@ select option.is-default {
 }
 
 .message {
-  border-radius: 0px !important;
   margin-bottom: 0px !important;
+}
+
+.chat-message {
+  padding: 10px 20px;
 }
 
 .user-message>.message-body {

@@ -14,7 +14,7 @@ let hasModels = hasActiveModels()
 onMount(() => {
     if (!$started) {
       $started = true
-      // console.log('started', apiKey, $lastChatId, getChat($lastChatId))
+      console.log('started', apiKey, $lastChatId, getChat($lastChatId))
       if (hasActiveModels() && getChat($lastChatId)) {
         const chatId = $lastChatId
         $lastChatId = ''
