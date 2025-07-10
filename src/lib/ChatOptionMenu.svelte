@@ -250,10 +250,6 @@
       <a href={'#'} class="dropdown-item" class:is-disabled={!chatId} on:click|preventDefault={() => { if (chatId) close(); delChat() }}>
         <span class="menu-icon"><Fa icon={faTrash}/></span> Delete Chat
       </a>
-      <hr class="dropdown-divider">
-      <a href={'#'} class:is-disabled={!chatId} on:click|preventDefault={() => { chatId && close(); chatId && startNewChatFromChatId(chatId) }} class="dropdown-item">
-        <span class="menu-icon"><Fa icon={faSquarePlusOutline}/></span> New Chat from Current
-      </a>
       <a href={'#'} class="dropdown-item" class:is-disabled={!chatId} on:click|preventDefault={() => { if (chatId) close(); copyChat(chatId) }}>
         <span class="menu-icon"><Fa icon={faClone}/></span> Clone Chat
       </a>
