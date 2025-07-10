@@ -244,13 +244,13 @@
   </div>
   <div class="dropdown-menu" id="dropdown-menu3" role="menu">
     <div class="dropdown-content">
-      <a href={'#'} class="dropdown-item" class:is-disabled={!chatId} on:click|preventDefault={() => { if (chatId) close(); $showSetChatSettings = true }}>
-        <span class="menu-icon"><Fa icon={faGear}/></span> Chat Profile Settings
+      <a href={'#'} class:is-disabled={!hasActiveModels()} on:click|preventDefault={() => { hasActiveModels() && close(); hasActiveModels() && startNewChatWithWarning(chatId) }} class="dropdown-item">
+        <span class="menu-icon"><Fa icon={faSquarePlus}/></span> New Chat
+      </a>
+      <a href={'#'} class="dropdown-item" class:is-disabled={!chatId} on:click|preventDefault={() => { if (chatId) close(); delChat() }}>
+        <span class="menu-icon"><Fa icon={faTrash}/></span> Delete Chat
       </a>
       <hr class="dropdown-divider">
-      <a href={'#'} class:is-disabled={!hasActiveModels()} on:click|preventDefault={() => { hasActiveModels() && close(); hasActiveModels() && startNewChatWithWarning(chatId) }} class="dropdown-item">
-        <span class="menu-icon"><Fa icon={faSquarePlus}/></span> New Chat from Default
-      </a>
       <a href={'#'} class:is-disabled={!chatId} on:click|preventDefault={() => { chatId && close(); chatId && startNewChatFromChatId(chatId) }} class="dropdown-item">
         <span class="menu-icon"><Fa icon={faSquarePlusOutline}/></span> New Chat from Current
       </a>
@@ -285,13 +285,10 @@
       <a href={'#'} class="dropdown-item" on:click|preventDefault={() => { close(); dumpLocalStorage() }}>
         <span class="menu-icon"><Fa icon={faUpload}/></span> Dump All Data
       </a>
-      <a href={'#'} class="dropdown-item" on:click|preventDefault={() => { if (chatId) close(); backupLocalStorage(); loadLocalStorage() }}>
+      <a href={'#'} class="dropdown-item" on:click|preventDefault={() => { if (chatId) close(); loadLocalStorage() }}>
         <span class="menu-icon"><Fa icon={faDownload}/></span> Load All Data
       </a>
       <hr class="dropdown-divider">
-      <a href={'#'} class="dropdown-item" class:is-disabled={!chatId} on:click|preventDefault={() => { if (chatId) close(); delChat() }}>
-        <span class="menu-icon"><Fa icon={faTrash}/></span> Delete Chat
-      </a>
       <a href={'#'} class="dropdown-item" class:is-disabled={$chatsStorage && !$chatsStorage[0]} on:click|preventDefault={() => { confirmClearChats() }}>
         <span class="menu-icon"><Fa icon={faTrashCan}/></span> Delete ALL Chats
       </a>
@@ -304,6 +301,9 @@
         {/if}
       </a>
       <hr class="dropdown-divider">
+      <a href={'#'} class="dropdown-item" class:is-disabled={!chatId} on:click|preventDefault={() => { if (chatId) close(); $showSetChatSettings = true }}>
+        <span class="menu-icon"><Fa icon={faGear}/></span> Chat Profile Settings
+      </a>
       <a href={'#/'} class="dropdown-item" on:click={close}>
         <span class="menu-icon"><Fa icon={faKey}/></span> API Setting
       </a>
