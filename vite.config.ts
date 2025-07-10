@@ -31,7 +31,7 @@ export default defineConfig(({ command, mode, ssrBuild }) => {
           ]
         }
       },
-      base: './public'
+      base: './'
     }
   } else {
     return {
