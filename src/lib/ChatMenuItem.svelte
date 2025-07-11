@@ -18,11 +18,7 @@
 
   let waitingForConfirm:any = 0
 
-  onMount(async () => {
-    if (!chat.name) {
-      chat.name = `Chat ${chat.id}`
-    }
-  })
+  chat = { ...chat }
 
   const keydown = (event:KeyboardEvent) => {
     if (event.key === 'Escape') {

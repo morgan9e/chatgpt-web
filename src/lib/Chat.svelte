@@ -314,7 +314,7 @@
   const suggestName = async (): Promise<void> => {
     const suggestMessage: Message = {
       role: 'user',
-      content: "Using appropriate language, please tell me a short 6 word summary of this conversation's topic for use as a book title. Only respond with the summary.",
+      content: "Suggest a 6 word summary of this conversation's topic for use as a title of this converstation. Only respond with the 6 word summary.",
       uuid: uuidv4()
     }
 
@@ -322,7 +322,6 @@
     suggestMessages.push(suggestMessage)
 
     const currentModel = chat.settings.model
-    // chat.settings.model = "gpt-4o";
 
     chatRequest.updating = true
     chatRequest.updatingMessage = 'Getting suggestion for chat name...'

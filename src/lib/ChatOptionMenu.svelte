@@ -19,7 +19,7 @@
   } from '@fortawesome/free-solid-svg-icons/index'
   import { faSquareMinus, faSquarePlus as faSquarePlusOutline } from '@fortawesome/free-regular-svg-icons/index'
   import { addChatFromJSON, chatsStorage, checkStateChange, clearChats, clearMessages, copyChat, globalStorage, setGlobalSettingValueByKey, showSetChatSettings, pinMainMenu, getChat, deleteChat, saveChatStore, saveCustomProfile } from './Storage.svelte'
-  import { getChatSortOption } from './Storage.svelte'
+  import { getChatSortOption, loadLocalStorage, dumpLocalStorage } from './Storage.svelte'
   import { exportAsMarkdown, exportChatAsJSON } from './Export.svelte'
   import { newNameForProfile, restartProfile } from './Profiles.svelte'
   import { replace } from 'svelte-spa-router'
@@ -163,73 +163,6 @@
     }
     reader.readAsText(image)
   }
-
-  function dumpLocalStorage () {
-    try {
-      const storageObject = {}
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (key) {
-          storageObject[key] = localStorage.getItem(key)
-        }
-      }
-
-      const dataStr = JSON.stringify(storageObject, null, 2)
-      const blob = new Blob([dataStr], { type: 'application/json' })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      const now = new Date()
-      const dateTimeStr = now.toISOString().replace(/:\d+\.\d+Z$/, '').replace(/-|:/g, '_')
-      link.download = `ChatGPT-web-${dateTimeStr}.json`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
-    } catch (error) {
-      console.error('Error dumping localStorage:', error)
-    }
-  }
-  
-  function loadLocalStorage () {
-    const fileInput = document.createElement('input')
-    fileInput.type = 'file'
-    fileInput.addEventListener('change', function (e) {
-      const file = e.target.files[0]
-      if (file) {
-        const reader = new FileReader()
-        reader.onload = function (e) {
-          const data = JSON.parse(e.target.result)
-          Object.keys(data).forEach(function (key) {
-            localStorage.setItem(key, data[key])
-          })
-          window.location.reload()
-        }
-        reader.readAsText(file)
-      }
-    })
-    document.body.appendChild(fileInput)
-    fileInput.click()
-    fileInput.remove()
-  }
-
-  function backupLocalStorage () {
-    try {
-      const storageObject = {}
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (key) {
-          storageObject[key] = localStorage.getItem(key)
-        }
-      }
-      const dataStr = JSON.stringify(storageObject, null, 2)
-      const now = new Date()
-      const dateTimeStr = now.toISOString().replace(/:\d+\.\d+Z$/, '').replace(/-|:/g, '_')
-      localStorage.setItem(`prev-${dateTimeStr}`, dataStr)
-    } catch (error) {
-      console.error('Error backing up localStorage:', error)
-    }
-}
 
 </script>
 

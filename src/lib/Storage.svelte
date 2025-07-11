@@ -611,4 +611,56 @@
     latestModelMap.set(modelMapStore)
   }
   
+  export const dumpLocalStorage = () => {
+    try {
+      const storageObject: Record<string, string | null> = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key) {
+          storageObject[key] = localStorage.getItem(key);
+        }
+      }
+
+      const dataStr = JSON.stringify(storageObject, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const now = new Date();
+      const dateTimeStr = now.toISOString().replace(/:\d+\.\d+Z$/, '').replace(/-|:/g, '_');
+      link.download = `ChatGPT-web-${dateTimeStr}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error dumping localStorage:', error);
+    }
+  };
+
+  export const loadLocalStorage = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.addEventListener('change', function (e) {
+      const input = e.target as HTMLInputElement;
+      if (!input.files || input.files.length === 0) return;
+      const file = input.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          if (!e.target) return;
+          const data = JSON.parse(e.target.result as string);
+          Object.keys(data).forEach(function (key) {
+            localStorage.setItem(key, data[key]);
+          });
+          window.location.reload();
+        };
+        reader.readAsText(file);
+      }
+    });
+    document.body.appendChild(fileInput);
+    fileInput.click();
+    document.body.removeChild(fileInput);
+  };
+
 </script>
