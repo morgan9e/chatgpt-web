@@ -191,24 +191,23 @@ export class ChatRequest {
             if (typeof setting.apiTransform === 'function') {
               value = setting.apiTransform(chatId, setting, value)
             }
+            console.log(key, value);
             if (key === 'max_tokens') {
               if (opts.maxTokens) value = opts.maxTokens // only as large as requested
               if (value > maxAllowed || value < 1) value = null // if over max model, do not define max
               if (value) value = Math.floor(value)
-              if (modelDetail.reasoning == true) {
-                key = 'max_completion_tokens'
-              }
+              key = 'max_completion_tokens'
             }
             if (key === 'n') {
               if (opts.streaming || opts.summaryRequest) {
-                /*
-                Streaming goes insane with more than one completion.
-                Doesn't seem like there's any way to separate the jumbled mess of deltas for the
-                different completions.
-                Summary should only have one completion
-                */
                 value = 1
               }
+            }
+            if ( key === 'reasoning_effort') {
+              if (modelDetail.extparams != true) return acc
+            }
+            if ( key === 'verbosity') {
+              if (modelDetail.extparams != true) return acc
             }
             if (value !== null) acc[key] = value
             return acc

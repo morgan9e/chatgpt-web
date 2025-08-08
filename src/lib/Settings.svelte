@@ -79,7 +79,8 @@ const gptDefaults = {
   presence_penalty: 0,
   frequency_penalty: 0,
   logit_bias: null,
-  user: undefined
+  reasoning_effort: null,
+  verbosity: null,
 }
 
 // Core set of defaults
@@ -635,6 +636,28 @@ const chatSettingsList: ChatSetting[] = [
         hide: hideModelSetting
       },
       {
+        key: 'reasoning_effort',
+        name: 'Reasoning Effort',
+        title: 'minimal, low, medium, high',
+        type: 'text',
+        placeholder: (chatId) => {
+          const val = getModelDetail(getChatSettings(chatId).model).systemEnd
+          return val || ''
+        },
+        hide: () => false
+      },
+      {
+        key: 'verbosity',
+        name: 'Verbosity',
+        title: 'low, medium, high',
+        type: 'text',
+        placeholder: (chatId) => {
+          const val = getModelDetail(getChatSettings(chatId).model).systemEnd
+          return val || ''
+        },
+        hide: () => false
+      },
+      {
         key: 'leadPrompt',
         name: 'Completion Lead Sequence',
         title: 'Sequence to hint to answer as assistant.',
@@ -645,38 +668,6 @@ const chatSettingsList: ChatSetting[] = [
         },
         hide: hideModelSetting
       },
-      {
-        // logit bias editor not implemented yet
-        key: 'logit_bias',
-        name: 'Logit Bias',
-        title: 'Allows you to adjust bias of tokens used in completion.',
-        header: 'Logit Bias. See <a target="_blank" href="https://help.openai.com/en/articles/5247780-using-logit-bias-to-define-token-probability">this article</a> for more details.',
-        type: 'other',
-        hide: () => true,
-        // transform to word->weight pairs to token(s)->weight.
-        //  -- care should be taken to have each word key in the each record formatted in a way where they
-        //     only take one token each else you'll end up with results you probably don't want.
-        //     Generally, leading space plus common lower case word will more often result in a single token
-        //     See: https://platform.openai.com/tokenizer
-        apiTransform: (chatId, setting, val:Record<string, number>) => {
-          // console.log('logit_bias', val, getChatSettings(chatId).logit_bias)
-          if (!val) return null
-          const tokenized:Record<number, number> = Object.entries(val).reduce((a, [k, v]) => {
-            const tokens:number[] = getTokens(getChatSettings(chatId).model, k)
-            tokens.forEach(t => { a[t] = v })
-            return a
-          }, {} as Record<number, number>)
-          return tokenized
-        }
-      },
-      // Enable?
-      {
-        key: 'user',
-        name: 'User?',
-        title: 'Name of user?',
-        type: 'text',
-        hide: () => true
-      }
 ]
 
 const chatSettingLookup:Record<string, ChatSetting> = chatSettingsList.reduce((a, v) => {
