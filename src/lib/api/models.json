@@ -1,4 +1,5 @@
 {
+  "claude-sonnet-4-5-20250929":    { "prompt": 3.0,   "completion": 15.0, "max": 200000 },
   "claude-sonnet-4-20250514":      { "prompt": 3.0,   "completion": 15.0, "max": 200000 },
   "claude-opus-4-20250514":        { "prompt": 15.0,  "completion": 75.0, "max": 200000 },
   "claude-3-7-sonnet-20250219":    { "prompt": 3.0,   "completion": 15.0, "max": 200000 },
